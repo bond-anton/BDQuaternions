@@ -72,7 +72,7 @@ class TestQuaternion(unittest.TestCase):
         self.assertEqual(3 / self.q1, 3 * self.q1.reciprocal())
 
     def test_exp_and_log(self):
-        #self.assertEqual(qf.log(qf.exp(self.q1)), self.q1)
+        self.assertEqual(qf.log(qf.exp(self.q1)), self.q1)
         #self.assertEqual(qf.log(qf.exp(self.q2)), self.q2)
         self.assertEqual(qf.exp(qf.log(self.q1)), self.q1)
         self.assertEqual(qf.exp(qf.log(self.q2)), self.q2)
