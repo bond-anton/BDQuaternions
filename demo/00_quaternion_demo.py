@@ -2,7 +2,7 @@ from __future__ import division, print_function
 import numpy as np
 
 from Quaternions import Quaternion
-from Quaternions import functions as qt
+from Quaternions import functions as qf
 
 q1 = Quaternion()
 q2 = Quaternion(np.array([1, 2, 3, 4]))
@@ -32,9 +32,11 @@ print('q1 polar representation:', q1.polar)
 print('q2 polar representation:', q2.polar)
 print('q1^3 =', q1 ** 3)
 print('q2^3 =', q2 ** 3)
-print('exp(q1) =', qt.exp(q1))
-print('exp(q2) =', qt.exp(q2))
-print('log(q1) =', qt.log(q1))
-print('log(q2) =', qt.log(q2))
-print('exp(log(q1)) =', qt.exp(qt.log(q1)))
-print('exp(log(q2)) =', qt.exp(qt.log(q2)))
+print('exp(q1) =', qf.exp(q1))
+print('exp(q2) =', qf.exp(q2))
+print('log(q1) =', qf.log(q1))
+print('log(q2) =', qf.log(q2))
+print('exp(log(q1)) =', qf.exp(qf.log(q1)))
+print('exp(log(q2)) =', qf.exp(qf.log(q2)))
+print('log(exp(q1)) =', qf.log(qf.exp(q1)))
+print('log(exp(q2)) =', qf.log(qf.exp(q2)))

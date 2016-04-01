@@ -1,7 +1,9 @@
 from __future__ import division
 import unittest
-from Quaternions import Quaternion
 import numpy as np
+
+from Quaternions import Quaternion
+from Quaternions import functions as qf
 
 
 class TestQuaternion(unittest.TestCase):
@@ -68,3 +70,10 @@ class TestQuaternion(unittest.TestCase):
         self.assertRaises(ValueError, self.q1.__rdiv__, self.q2)
         self.assertEqual(self.q1 / 3, 1 / 3 * self.q1)
         self.assertEqual(3 / self.q1, 3 * self.q1.reciprocal())
+
+    def test_exp_and_log(self):
+        #self.assertEqual(qf.log(qf.exp(self.q1)), self.q1)
+        #self.assertEqual(qf.log(qf.exp(self.q2)), self.q2)
+        self.assertEqual(qf.exp(qf.log(self.q1)), self.q1)
+        self.assertEqual(qf.exp(qf.log(self.q2)), self.q2)
+
