@@ -9,7 +9,7 @@ class UnitQuaternion(Quaternion):
 
     def __init__(self, quadruple=None):
         if quadruple is None:
-            quadruple = np.array([0, 0, 0, 1])
+            quadruple = np.array([1, 0, 0, 0])
         quadruple = np.array(quadruple, dtype=np.float)
         assert np.allclose(np.sum(quadruple ** 2), 1.0)
         super(UnitQuaternion, self).__init__(quadruple)
