@@ -66,14 +66,38 @@ class Quaternion(object):
     def __add__(self, other):
         if isinstance(other, Quaternion):
             return Quaternion(self.quadruple + other.quadruple)
+        elif isinstance(other, numbers.Number):
+            q2 = np.array([float(other), 0, 0, 0])
+            return self + Quaternion(q2)
         else:
-            raise ValueError('Only another quaternion can be added to quaternion')
+            raise ValueError('Only another quaternion or number can be added to quaternion')
+
+    def __radd__(self, other):
+        if isinstance(other, Quaternion):
+            return other + self
+        elif isinstance(other, numbers.Number):
+            q2 = np.array([float(other), 0, 0, 0])
+            return Quaternion(q2) + self
+        else:
+            raise ValueError('Only another quaternion or number can be added to quaternion')
 
     def __sub__(self, other):
         if isinstance(other, Quaternion):
             return self + (-1 * other)
+        elif isinstance(other, numbers.Number):
+            q2 = np.array([float(other), 0, 0, 0])
+            return self - Quaternion(q2)
         else:
-            raise ValueError('Only another quaternion can be subtracted from quaternion')
+            raise ValueError('Only another quaternion or number be subtracted from quaternion')
+
+    def __rsub__(self, other):
+        if isinstance(other, Quaternion):
+            return other - self
+        elif isinstance(other, numbers.Number):
+            q2 = np.array([float(other), 0, 0, 0])
+            return Quaternion(q2) - self
+        else:
+            raise ValueError('Only another quaternion or number be subtracted from quaternion')
 
     def norm(self):
         return np.sqrt(np.sum(self.quadruple * self.quadruple))
