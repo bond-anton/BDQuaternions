@@ -17,6 +17,13 @@ class Rotation(UnitQuaternion):
         super(Rotation, self).__init__(quadruple)
         self._set_euler_angles_convention(euler_angles_convention)
 
+    def conjugate(self):
+        quadruple = np.hstack((self.scalar_part(), -self.vector_part()))
+        return Rotation(quadruple)
+
+    def reciprocal(self):
+        return self.conjugate()
+
     def _get_rotation_matrix(self):
         w, x, y, z = self.quadruple
         m = np.array([[1 - 2 * y**2 - 2 * z**2, 2 * x * y + 2 * w * z, 2 * x * z - 2 * w * y],
@@ -26,14 +33,15 @@ class Rotation(UnitQuaternion):
 
     def _set_rotation_matrix(self, m):
         det_m = np.linalg.det(m)
+        if abs(1 - det_m ** 2) > 1e-6:
+            raise ValueError('Not a rotation matrix. det M = %2.2g' % det_m)
         inv_m = np.linalg.inv(m)
         if np.allclose(det_m, 1.0) and np.allclose(m.T, inv_m):
-            print('Precise rotation matrix')
             m = np.array(m, dtype=np.float)
             if m.shape != (3, 3):
                 raise ValueError('3x3 rotation matrix expected, got' + str(m))
             t = np.trace(m)
-            if t > 3 * np.finfo.eps:
+            if t > 3 * np.finfo(float).eps:
                 r = np.sqrt(1 + t)
                 w = 0.5 * r
                 s = 0.5 / r
@@ -63,11 +71,11 @@ class Rotation(UnitQuaternion):
                 z = 0.5 * r
             quadruple = np.array([w, x, y, z])
         else:
-            print(m.T - inv_m)
-            k_m = np.array([[m[0, 0] - m[1, 1] - m[2, 2], m[1, 0] + m[0, 1], m[2, 0] + m[0, 2], m[1, 2] - m[2, 1]],
-                            [m[1, 0] + m[0, 1], m[1, 1] - m[0, 0] - m[2, 2], m[2, 1] + m[1, 2], m[2, 0] - m[0, 2]],
-                            [m[2, 0] + m[0, 2], m[2, 1] + m[1, 2], m[2, 2] - m[0, 0] - m[1, 1], m[0, 1] - m[1, 0]],
-                            [m[1, 2] - m[2, 1], m[2, 0] - m[0, 2], m[0, 1] - m[1, 0], m[0, 0] + m[1, 1] + m[2, 2]]]) / 3
+            print('Not a rotation matrix. det M = %2.2g' % det_m)
+            k_m = np.array([[m[0, 0] - m[1, 1] - m[2, 2], m[0, 1] + m[1, 0], m[0, 2] + m[2, 0], m[2, 1] - m[1, 2]],
+                            [m[0, 1] + m[1, 0], m[1, 1] - m[0, 0] - m[2, 2], m[1, 2] + m[2, 1], m[0, 2] - m[2, 0]],
+                            [m[0, 2] + m[2, 0], m[1, 2] + m[2, 1], m[2, 2] - m[0, 0] - m[1, 1], m[1, 0] - m[0, 1]],
+                            [m[2, 1] - m[1, 2], m[0, 2] - m[2, 0], m[1, 0] - m[0, 1], m[0, 0] + m[1, 1] + m[2, 2]]]) / 3
             w, v_n = np.linalg.eigh(k_m)
             quadruple = v_n[[3, 0, 1, 2], np.argmax(w)]
         self.quadruple = quadruple

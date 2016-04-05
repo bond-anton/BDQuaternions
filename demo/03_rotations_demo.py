@@ -9,5 +9,8 @@ print(rotation)
 m = rotation.rotation_matrix
 noise = np.random.random((3, 3)) * 1e-6
 #print(m + noise)
-rotation.rotation_matrix = m + noise
+rotation.rotation_matrix = np.array([[1, 0, 0],
+                                     [0, -1, 0],
+                                     [0, 0, -1]])
 print(rotation)
+print(rotation.reciprocal())
