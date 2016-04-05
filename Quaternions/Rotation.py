@@ -102,11 +102,28 @@ class Rotation(UnitQuaternion):
         return information
 
     def _set_euler_angles_convention(self, euler_angles_convention):
+        """
+        Euler angles conversion algorithm by Ken Shoemake in Graphics Gems IV (Academic Press, 1994), p. 222
+        """
+        # the tuples decode inner axis (X - 0, Y - 1, Z - 2), parity (Even - 0, Odd - 1),
+        # repetition (No - 0, Yes - 1), frame (0 - static; 1 - rotating frame)
+        euler_angles_convention = {
+            # static frame
+            'XYZs': (0, 0, 0, 0), 'XYXs': (0, 0, 1, 0), 'XZYs': (0, 1, 0, 0),
+            'XZXs': (0, 1, 1, 0), 'YZXs': (1, 0, 0, 0), 'YZYs': (1, 0, 1, 0),
+            'YXZs': (1, 1, 0, 0), 'YXYs': (1, 1, 1, 0), 'ZXYs': (2, 0, 0, 0),
+            'ZXZs': (2, 0, 1, 0), 'ZYXs': (2, 1, 0, 0), 'ZYZs': (2, 1, 1, 0),
+            # rotating frame
+            'ZYXr': (0, 0, 0, 1), 'XYXr': (0, 0, 1, 1), 'YZXr': (0, 1, 0, 1),
+            'XZXr': (0, 1, 1, 1), 'XZYr': (1, 0, 0, 1), 'YZYr': (1, 0, 1, 1),
+            'ZXYr': (1, 1, 0, 1), 'YXYr': (1, 1, 1, 1), 'YXzr': (2, 0, 0, 1),
+            'ZXZr': (2, 0, 1, 1), 'XYZr': (2, 1, 0, 1), 'ZYZr': (2, 1, 1, 1)}
+
         conventions = {
-            'Bunge': {'variants': ['bunge', 'zxz'],
+            'rzxz': {'variants': ['bunge', 'zxz'],
                       'labels': ['phi1', 'Phi', 'phi2'],
                       'description': 'Bunge (phi1 Phi phi2) ZXZ convention'},
-            'Matthies': {'variants': ['matthies', 'zyz', 'nfft', 'abg'],
+            'rzyz': {'variants': ['matthies', 'zyz', 'nfft', 'abg'],
                          'labels': ['alpha', 'beta', 'gamma'],
                          'description': 'Matthies (alpha beta gamma) ZYZ convention'},
             'Roe': {'variants': ['roe'],
