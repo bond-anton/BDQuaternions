@@ -82,12 +82,23 @@ class Rotation(UnitQuaternion):
 
     rotation_matrix = property(_get_rotation_matrix, _set_rotation_matrix)
 
+    def _get_axis_angle(self):
+        _, axis, theta = self.polar
+        return axis, theta * 2
+
+    def _set_axis_angle(self, (axis, theta)):
+        self.polar = 1, axis, theta / 2
+
+    axis_angle = property(_get_axis_angle, _set_axis_angle)
+
     def __str__(self):
         information = 'Rotation quaternion: ' + str(self.quadruple) + '\n'
         information += 'Orientation: %s:\n' % self.euler_angles_convention['description'] + '\n'
         #information += str(self.euler_angles) + '\n'
         information += 'rotation matrix:\n'
         information += str(self.rotation_matrix) + '\n'
+        information += 'rotation axis, angle:\n'
+        information += str(self.axis_angle) + '\n'
         return information
 
     def _set_euler_angles_convention(self, euler_angles_convention):
