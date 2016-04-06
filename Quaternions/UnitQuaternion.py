@@ -2,6 +2,8 @@ from __future__ import division, print_function
 import numbers
 import numpy as np
 
+from _quaternion_operations import check_quadruple, mul
+
 from Quaternions import Quaternion
 
 
@@ -9,8 +11,8 @@ class UnitQuaternion(Quaternion):
 
     def __init__(self, quadruple=None):
         if quadruple is None:
-            quadruple = np.array([1, 0, 0, 0])
-        quadruple = np.array(quadruple, dtype=np.float)
+            quadruple = [1, 0, 0, 0]
+        quadruple = check_quadruple(quadruple)
         assert np.allclose(np.sum(quadruple ** 2), 1.0)
         super(UnitQuaternion, self).__init__(quadruple)
 
@@ -20,19 +22,12 @@ class UnitQuaternion(Quaternion):
 
     def __mul__(self, other):
         if isinstance(other, UnitQuaternion):
-            q1 = self.quadruple
-            q2 = other.quadruple
-            quadruple = np.array([q1[0] * q2[0] - q1[1] * q2[1] - q1[2] * q2[2] - q1[3] * q2[3],
-                                  q1[0] * q2[1] + q1[1] * q2[0] + q1[2] * q2[3] - q1[3] * q2[2],
-                                  q1[0] * q2[2] - q1[1] * q2[3] + q1[2] * q2[0] + q1[3] * q2[1],
-                                  q1[0] * q2[3] + q1[1] * q2[2] - q1[2] * q2[1] + q1[3] * q2[0]])
-            return UnitQuaternion(quadruple)
+            return UnitQuaternion(mul(self.quadruple, other.quadruple))
         elif isinstance(other, Quaternion):
-            return Quaternion(self.quadruple) * other
+            return Quaternion(mul(self.quadruple, other.quadruple))
         elif isinstance(other, numbers.Number):
             if np.allclose(abs(float(other)), 1):
-                q2 = np.array([float(other), 0, 0, 0])
-                return self * UnitQuaternion(q2)
+                return UnitQuaternion(self.quadruple)
             else:
                 return Quaternion(self.quadruple) * other
         else:
@@ -42,11 +37,10 @@ class UnitQuaternion(Quaternion):
         if isinstance(other, UnitQuaternion):
             return other * self
         elif isinstance(other, Quaternion):
-            return other * Quaternion(self.quadruple)
+            return Quaternion(mul(other.quadruple, self.quadruple))
         elif isinstance(other, numbers.Number):
             if np.allclose(abs(float(other)), 1):
-                q2 = np.array([float(other), 0, 0, 0])
-                return UnitQuaternion(q2) * self
+                return UnitQuaternion(self.quadruple)
             else:
                 return other * Quaternion(self.quadruple)
         else:

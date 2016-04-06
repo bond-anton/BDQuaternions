@@ -2,6 +2,8 @@ from __future__ import division, print_function
 import numpy as np
 import numbers
 
+from _quaternion_operations import check_quadruple, mul, norm, real_matrix, complex_matrix
+
 
 class Quaternion(object):
 
@@ -19,10 +21,7 @@ class Quaternion(object):
             raise ValueError('Only another quaternion can be compared to given quaternion')
 
     def _set_quadruple(self, quadruple):
-        quadruple = np.array(quadruple, dtype=np.float)
-        if quadruple.size != 4:
-            raise ValueError('Quadruple must have exactly 4 elements')
-        self._quadruple = quadruple
+        self._quadruple = check_quadruple(quadruple)
 
     def _get_quadruple(self):
         return self._quadruple
@@ -41,16 +40,9 @@ class Quaternion(object):
 
     def __mul__(self, other):
         if isinstance(other, Quaternion):
-            q1 = self.quadruple
-            q2 = other.quadruple
-            quadruple = np.array([q1[0] * q2[0] - q1[1] * q2[1] - q1[2] * q2[2] - q1[3] * q2[3],
-                                  q1[0] * q2[1] + q1[1] * q2[0] + q1[2] * q2[3] - q1[3] * q2[2],
-                                  q1[0] * q2[2] - q1[1] * q2[3] + q1[2] * q2[0] + q1[3] * q2[1],
-                                  q1[0] * q2[3] + q1[1] * q2[2] - q1[2] * q2[1] + q1[3] * q2[0]])
-            return Quaternion(quadruple)
+            return Quaternion(mul(self.quadruple, other.quadruple))
         elif isinstance(other, numbers.Number):
-            q2 = np.array([float(other), 0, 0, 0])
-            return self * Quaternion(q2)
+            return Quaternion(mul(self.quadruple, [float(other), 0, 0, 0]))
         else:
             raise ValueError('Quaternion can be multiplied only by another quaternion')
 
@@ -58,8 +50,7 @@ class Quaternion(object):
         if isinstance(other, Quaternion):
             return other * self
         elif isinstance(other, numbers.Number):
-            q2 = np.array([float(other), 0, 0, 0])
-            return Quaternion(q2) * self
+            return Quaternion(mul([float(other), 0, 0, 0], self.quadruple))
         else:
             raise ValueError('Quaternion can be multiplied only by another quaternion or number')
 
@@ -67,8 +58,7 @@ class Quaternion(object):
         if isinstance(other, Quaternion):
             return Quaternion(self.quadruple + other.quadruple)
         elif isinstance(other, numbers.Number):
-            q2 = np.array([float(other), 0, 0, 0])
-            return self + Quaternion(q2)
+            return Quaternion(self.quadruple + np.array([float(other), 0, 0, 0]))
         else:
             raise ValueError('Only another quaternion or number can be added to quaternion')
 
@@ -76,8 +66,7 @@ class Quaternion(object):
         if isinstance(other, Quaternion):
             return other + self
         elif isinstance(other, numbers.Number):
-            q2 = np.array([float(other), 0, 0, 0])
-            return Quaternion(q2) + self
+            return Quaternion(np.array([float(other), 0, 0, 0]) + self.quadruple)
         else:
             raise ValueError('Only another quaternion or number can be added to quaternion')
 
@@ -85,8 +74,7 @@ class Quaternion(object):
         if isinstance(other, Quaternion):
             return self + (-1 * other)
         elif isinstance(other, numbers.Number):
-            q2 = np.array([float(other), 0, 0, 0])
-            return self - Quaternion(q2)
+            return Quaternion(self.quadruple - np.array([float(other), 0, 0, 0]))
         else:
             raise ValueError('Only another quaternion or number be subtracted from quaternion')
 
@@ -94,13 +82,12 @@ class Quaternion(object):
         if isinstance(other, Quaternion):
             return other - self
         elif isinstance(other, numbers.Number):
-            q2 = np.array([float(other), 0, 0, 0])
-            return Quaternion(q2) - self
+            return Quaternion(np.array([float(other), 0, 0, 0]) - self.quadruple)
         else:
             raise ValueError('Only another quaternion or number be subtracted from quaternion')
 
     def norm(self):
-        return np.sqrt(np.sum(self.quadruple * self.quadruple))
+        return norm(self.quadruple)
 
     def distance(self, other):
         if isinstance(other, Quaternion):
@@ -145,11 +132,11 @@ class Quaternion(object):
         return self.__rdiv__(other)
 
     def _get_polar(self):
-        if not np.allclose(self.norm(), 0.0):
+        if not np.allclose(self.norm(), [0.0]):
             a = self.scalar_part()
             v = self.vector_part()
             v_norm = np.sqrt(np.sum(v * v))
-            if not np.allclose(v_norm, 0.0):
+            if not np.allclose(v_norm, [0.0]):
                 n_hat = v / v_norm
             else:
                 n_hat = np.zeros(3)
@@ -158,32 +145,26 @@ class Quaternion(object):
         else:
             return 0, np.zeros(3), 0
 
-    def _set_polar(self, (norm, n_hat, theta)):
-        assert norm >= 0
-        assert np.allclose(np.sqrt(np.sum(n_hat * n_hat)), 1.0)
-        a = norm * np.cos(theta)
-        v = n_hat * norm * np.sin(theta)
+    def _set_polar(self, (q_norm, n_hat, theta)):
+        assert q_norm >= 0
+        assert np.allclose(np.sqrt(np.sum(n_hat * n_hat)), [1.0])
+        a = q_norm * np.cos(theta)
+        v = n_hat * q_norm * np.sin(theta)
         self._set_quadruple(np.hstack((a, v)))
 
     polar = property(_get_polar, _set_polar)
 
     def __pow__(self, power):
         if isinstance(power, numbers.Number):
-            norm, n_hat, theta = self.polar
+            q_norm, n_hat, theta = self.polar
             result = Quaternion()
-            result.polar = (norm ** power, n_hat, theta * power)
+            result.polar = (q_norm ** power, n_hat, theta * power)
             return result
         else:
             raise ValueError('Quaternions can be raised only into real-value power')
 
     def real_matrix(self):
-        a, b, c, d = self.quadruple
-        return np.array([[a, b, c, d],
-                         [-b, a, -d, c],
-                         [-c, d, a, -b],
-                         [-d, -c, b, a]])
+        return real_matrix(self.quadruple)
 
     def complex_matrix(self):
-        a, b, c, d = self.quadruple
-        return np.array([[a + b * 1j, c + d * 1j],
-                         [-c + d * 1j, a - b * 1j]])
+        return complex_matrix(self.quadruple)

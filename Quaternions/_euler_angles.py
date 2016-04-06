@@ -1,7 +1,8 @@
 from __future__ import division, print_function
 import numpy as np
 
-from EulerAnglesConventions import euler_angles_codes, conventions, default_convention, euler_next_axis
+from _quaternion_operations import quaternion_to_rotation_matrix
+from _euler_angles_conventions import euler_angles_codes, conventions, default_convention, euler_next_axis
 
 """
 Euler angles conversion algorithms after Ken Shoemake in Graphics Gems IV (Academic Press, 1994), p. 222
@@ -140,18 +141,6 @@ def euler_angles_to_quaternion(ai, aj, ak, convention):
     return quadruple
 
 
-def quaternion_to_matrix(quadruple):
-    q = np.array(quadruple, dtype=np.float)
-    assert q.size == 4
-    norm = np.sqrt(np.sum(q * q))
-    assert norm > 0
-    w, x, y, z = q / norm
-    m = np.array([[1 - 2 * y ** 2 - 2 * z ** 2, 2 * x * y + 2 * w * z, 2 * x * z - 2 * w * y],
-                  [2 * x * y - 2 * w * z, 1 - 2 * x ** 2 - 2 * z ** 2, 2 * y * z + 2 * w * x],
-                  [2 * x * z + 2 * w * y, 2 * y * z - 2 * w * x, 1 - 2 * x ** 2 - 2 * y ** 2]])
-    return m
-
-
 def euler_angles_from_quaternion(quadruple, convention):
-    matrix = quaternion_to_matrix(quadruple)
+    matrix = quaternion_to_rotation_matrix(quadruple)
     return euler_angles_from_matrix(matrix, convention)
