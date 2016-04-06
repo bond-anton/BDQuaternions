@@ -1,9 +1,9 @@
 from __future__ import division, print_function
-import numbers
 import numpy as np
 
 from Quaternions import UnitQuaternion
-from EulerAngles import check_euler_angles_convention
+from EulerAngles import quaternion_to_matrix, check_euler_angles_convention,\
+    euler_angles_from_quaternion, euler_angles_to_quaternion
 
 
 class Rotation(UnitQuaternion):
@@ -26,11 +26,7 @@ class Rotation(UnitQuaternion):
         return self.conjugate()
 
     def _get_rotation_matrix(self):
-        w, x, y, z = self.quadruple
-        m = np.array([[1 - 2 * y**2 - 2 * z**2, 2 * x * y + 2 * w * z, 2 * x * z - 2 * w * y],
-                      [2 * x * y - 2 * w * z, 1 - 2 * x**2 - 2 * z**2, 2 * y * z + 2 * w * x],
-                      [2 * x * z + 2 * w * y, 2 * y * z - 2 * w * x, 1 - 2 * x**2 - 2 * y**2]])
-        return m
+        return quaternion_to_matrix(self.quadruple)
 
     def _set_rotation_matrix(self, m):
         det_m = np.linalg.det(m)
@@ -94,8 +90,8 @@ class Rotation(UnitQuaternion):
 
     def __str__(self):
         information = 'Rotation quaternion: ' + str(self.quadruple) + '\n'
-        information += 'Orientation: %s:\n' % self.euler_angles_convention['description'] + '\n'
-        #information += str(self.euler_angles) + '\n'
+        information += 'Euler angles: %s\n' % self.euler_angles_convention['description'] + '\n'
+        information += str(self.euler_angles) + '\n'
         information += 'rotation matrix:\n'
         information += str(self.rotation_matrix) + '\n'
         information += 'rotation axis, angle:\n'
@@ -109,6 +105,15 @@ class Rotation(UnitQuaternion):
         return self._euler_angles_convention
 
     euler_angles_convention = property(_get_euler_angles_convention, _set_euler_angles_convention)
+
+    def _get_euler_angles(self):
+        return euler_angles_from_quaternion(self.quadruple, self.euler_angles_convention)
+
+    def _set_euler_angles(self, (ai, aj, ak)):
+        quadruple = euler_angles_to_quaternion(ai, aj, ak, self.euler_angles_convention)
+        self.quadruple = quadruple
+
+    euler_angles = property(_get_euler_angles, _set_euler_angles)
 
     def __add__(self, other):
         raise TypeError('Wrong operation for rotations \'+\'.')

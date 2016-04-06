@@ -1,3 +1,9 @@
+"""
+after Ken Shoemake in Graphics Gems IV (Academic Press, 1994), p. 222
+"""
+
+euler_next_axis = (1, 2, 0, 1)
+
 # the tuples are for inner axis (X - 0, Y - 1, Z - 2), parity (Even - 0, Odd - 1),
 # repetition (No - 0, Yes - 1), frame (0 - static; 1 - rotating frame)
 euler_angles_codes = {
@@ -18,16 +24,16 @@ conventions = {
     'Bunge': {'variants': ('bunge',),
               'axes': 'ZXZr',
               'labels': ('phi1', 'Phi', 'phi2'),
-              'description': 'Bunge (phi1 Phi phi2) ZXZ convention'},
+              'description': 'Bunge (phi1 Phi phi2) ZXZr convention'},
     'Matthies': {'variants': ('matthies', 'nfft', 'abg'),
                  'axes': 'ZYZr',
                  'labels': ('alpha', 'beta', 'gamma'),
-                 'description': 'Matthies (alpha beta gamma) ZYZ convention'},
+                 'description': 'Matthies (alpha beta gamma) ZYZr convention'},
     'Roe': {'variants': ('roe',),
             'axes': 'XYZs',
             'axes_labels': ('RD', 'TD', 'ND'),
             'labels': ('Psi', 'Theta', 'Phi'),
-            'description': 'Roe (Psi, Theta, Phi) RD,TD,ND convention'},
+            'description': 'Roe (Psi, Theta, Phi) RD,TD,ND convention (XYZs)'},
     # 'Kocks': {'variants': ('kocks',),
     #          'labels': ('Psi', 'Theta', 'phi'),
     #          'description': 'Kocks (Psi Theta phi) convention'},
