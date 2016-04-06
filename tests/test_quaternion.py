@@ -36,7 +36,7 @@ class TestQuaternion(unittest.TestCase):
     def test_addition(self):
         np.testing.assert_allclose((self.q1 + self.q2).quadruple, np.array([1, 2, 3, 5]))
         np.testing.assert_allclose((self.q1 - self.q2).quadruple, np.array([-1, -2, -3, -3]))
-        self.assertRaises(ValueError, self.q1.__add__, 3.0)
+        np.testing.assert_allclose((self.q1 - 3).quadruple, np.array([-3, 0, 0, 1]))
 
     def test_conjugation(self):
         np.testing.assert_allclose(self.q2.conjugate().quadruple, np.array([1, -2, -3, -4]))
@@ -72,6 +72,6 @@ class TestQuaternion(unittest.TestCase):
         self.assertEqual(3 / self.q1, 3 * self.q1.reciprocal())
 
     def test_exp_and_log(self):
-        my_quaternion = Quaternion((np.random.random(4) - 1) * 10)
+        my_quaternion = Quaternion((np.random.random(4) - 0.5))
         self.assertEqual(qf.exp(qf.log(my_quaternion)), my_quaternion)
-        self.assertEqual(qf.exp(qf.log(my_quaternion)), my_quaternion)
+        self.assertEqual(qf.log(qf.exp(my_quaternion)), my_quaternion)

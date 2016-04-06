@@ -57,7 +57,7 @@ def quaternion_from_rotation_matrix(matrix):
     if abs(1 - det_m ** 2) > 1e-6:
         raise ValueError('Not a rotation matrix. det M = %2.2g' % det_m)
     inv_m = np.linalg.inv(m)
-    if np.allclose(det_m, 1.0) and np.allclose(m.T, inv_m):
+    if np.allclose(det_m, [1.0]) and np.allclose(m.T, inv_m):
         m = np.array(m, dtype=np.float)
         if m.shape != (3, 3):
             raise ValueError('3x3 rotation matrix expected, got' + str(m))
@@ -100,3 +100,30 @@ def quaternion_from_rotation_matrix(matrix):
         w, v_n = np.linalg.eigh(k_m)
         quadruple = v_n[[3, 0, 1, 2], np.argmax(w)]
     return quadruple
+
+
+def exp(quadruple):
+    quadruple = check_quadruple(quadruple)
+    a = quadruple[0]
+    v = quadruple[1:]
+    v_norm = np.sqrt(np.sum(v * v))
+    if not np.allclose(v_norm, [0.0]):
+        return np.hstack((np.exp(a) * np.cos(v_norm), np.exp(a) * v / v_norm * np.sin(v_norm)))
+    else:
+        np.hstack((np.exp(a), np.zeros(3)))
+
+
+def log(quadruple):
+    quadruple = check_quadruple(quadruple)
+    q_norm = norm(quadruple)
+    if not np.allclose(q_norm, [0.0]):
+        a = quadruple[0]
+        v = quadruple[1:]
+        v_norm = np.sqrt(np.sum(v * v))
+        quadruple = np.zeros(4)
+        quadruple[0] = np.log(q_norm)
+        if not np.allclose(v_norm, [0.0]):
+            quadruple[1:] = v / v_norm * np.arccos(a / q_norm)
+        return quadruple
+    else:
+        raise ValueError('Only nonzero-quaternions are supported by log function')
