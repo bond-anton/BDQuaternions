@@ -3,6 +3,7 @@ import numbers
 import numpy as np
 
 from Quaternions import UnitQuaternion
+from EulerAngles import check_euler_angles_convention
 
 
 class Rotation(UnitQuaternion):
@@ -19,7 +20,7 @@ class Rotation(UnitQuaternion):
 
     def conjugate(self):
         quadruple = np.hstack((self.scalar_part(), -self.vector_part()))
-        return Rotation(quadruple)
+        return Rotation(quadruple, euler_angles_convention=self.euler_angles_convention['title'])
 
     def reciprocal(self):
         return self.conjugate()
@@ -102,57 +103,7 @@ class Rotation(UnitQuaternion):
         return information
 
     def _set_euler_angles_convention(self, euler_angles_convention):
-        """
-        Euler angles conversion algorithm by Ken Shoemake in Graphics Gems IV (Academic Press, 1994), p. 222
-        """
-        # the tuples decode inner axis (X - 0, Y - 1, Z - 2), parity (Even - 0, Odd - 1),
-        # repetition (No - 0, Yes - 1), frame (0 - static; 1 - rotating frame)
-        euler_angles_convention = {
-            # static frame
-            'XYZs': (0, 0, 0, 0), 'XYXs': (0, 0, 1, 0), 'XZYs': (0, 1, 0, 0),
-            'XZXs': (0, 1, 1, 0), 'YZXs': (1, 0, 0, 0), 'YZYs': (1, 0, 1, 0),
-            'YXZs': (1, 1, 0, 0), 'YXYs': (1, 1, 1, 0), 'ZXYs': (2, 0, 0, 0),
-            'ZXZs': (2, 0, 1, 0), 'ZYXs': (2, 1, 0, 0), 'ZYZs': (2, 1, 1, 0),
-            # rotating frame
-            'ZYXr': (0, 0, 0, 1), 'XYXr': (0, 0, 1, 1), 'YZXr': (0, 1, 0, 1),
-            'XZXr': (0, 1, 1, 1), 'XZYr': (1, 0, 0, 1), 'YZYr': (1, 0, 1, 1),
-            'ZXYr': (1, 1, 0, 1), 'YXYr': (1, 1, 1, 1), 'YXzr': (2, 0, 0, 1),
-            'ZXZr': (2, 0, 1, 1), 'XYZr': (2, 1, 0, 1), 'ZYZr': (2, 1, 1, 1)}
-
-        conventions = {
-            'rzxz': {'variants': ['bunge', 'zxz'],
-                      'labels': ['phi1', 'Phi', 'phi2'],
-                      'description': 'Bunge (phi1 Phi phi2) ZXZ convention'},
-            'rzyz': {'variants': ['matthies', 'zyz', 'nfft', 'abg'],
-                         'labels': ['alpha', 'beta', 'gamma'],
-                         'description': 'Matthies (alpha beta gamma) ZYZ convention'},
-            'Roe': {'variants': ['roe'],
-                    'labels': ['Psi', 'Theta', 'Phi'],
-                    'description': 'Roe (Psi, Theta, Phi) convention'},
-            'Kocks': {'variants': ['kocks'],
-                      'labels': ['Psi', 'Theta', 'phi'],
-                      'description': 'Kocks (Psi Theta phi) convention'},
-            'Canova': {'variants': ['canova'],
-                       'labels': ['omega', 'Theta', 'phi'],
-                       'description': 'Canova (omega, Theta, phi) convention'}
-        }
-        convention = conventions['Bunge']
-        if euler_angles_convention is not None:
-            match = False
-            for key in conventions.keys():
-                if str(euler_angles_convention).lower().strip() in conventions[key]['variants']:
-                    convention = conventions[key]
-                    match = True
-                    break
-            if not match:
-                print('Convention: %s not found or not supported.' % euler_angles_convention)
-                print('Falling back to Bunge convention.')
-            elif 'bunge' not in convention['variants']:
-                print('You asked to use %s' % convention['description'])
-                print('Unfortunately it is not supported for now.')
-                print('Falling back to Bunge convention.')
-                convention = conventions['Bunge']
-        self._euler_angles_convention = convention
+        self._euler_angles_convention = check_euler_angles_convention(euler_angles_convention)
 
     def _get_euler_angles_convention(self):
         return self._euler_angles_convention
@@ -179,12 +130,12 @@ class Rotation(UnitQuaternion):
                                   q1[0] * q2[1] + q1[1] * q2[0] + q1[2] * q2[3] - q1[3] * q2[2],
                                   q1[0] * q2[2] - q1[1] * q2[3] + q1[2] * q2[0] + q1[3] * q2[1],
                                   q1[0] * q2[3] + q1[1] * q2[2] - q1[2] * q2[1] + q1[3] * q2[0]])
-            return Rotation(quadruple)
+            return Rotation(quadruple, euler_angles_convention=self.euler_angles_convention['title'])
         else:
             raise ValueError('Rotation can be multiplied only by another rotation')
 
     def __rmul__(self, other):
         if isinstance(other, Rotation):
-            return other * Rotation
+            return other * self
         else:
             raise ValueError('Rotation can be multiplied only by another rotation')
