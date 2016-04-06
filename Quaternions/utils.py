@@ -9,23 +9,25 @@ from Quaternions import Quaternion, UnitQuaternion, Rotation
 
 def random_rotation():
     quadruple = np.array([1, 0, 0, 0], dtype=np.float)
+    random_quadruple_norm = 1.0
     while True:
         quadruple = (np.random.random(4) - 0.5) * 2
         random_quadruple_norm = norm(quadruple)
         if random_quadruple_norm > 0:
             break
-        quadruple /= random_quadruple_norm
+    quadruple /= random_quadruple_norm
     return Rotation(quadruple)
 
 
 def random_unit_quaternion():
     quadruple = np.array([1, 0, 0, 0], dtype=np.float)
+    random_quadruple_norm = 1.0
     while True:
         quadruple = (np.random.random(4) - 0.5) * 2
         random_quadruple_norm = norm(quadruple)
         if random_quadruple_norm > 0:
             break
-        quadruple /= random_quadruple_norm
+    quadruple /= random_quadruple_norm
     return UnitQuaternion(quadruple)
 
 
