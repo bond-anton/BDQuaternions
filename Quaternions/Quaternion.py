@@ -6,6 +6,9 @@ from _quaternion_operations import check_quadruple, mul, norm, real_matrix, comp
 
 
 class Quaternion(object):
+    """
+    General quaternion object
+    """
 
     def __init__(self, quadruple=np.array([0, 0, 0, 1])):
         self._quadruple = None
@@ -26,15 +29,30 @@ class Quaternion(object):
     def _get_quadruple(self):
         return self._quadruple
 
+    """
+    Property to get/set quaternion' quadruple
+    """
     quadruple = property(_get_quadruple, _set_quadruple)
 
     def scalar_part(self):
+        """
+        Calculates scalar part of the Quaternion
+        :return: scalar part of the Quaternion
+        """
         return self._quadruple[0]
 
     def vector_part(self):
+        """
+        Calculates vector part of the Quaternion
+        :return: vector part of the Quaternion
+        """
         return self._quadruple[1:]
 
     def conjugate(self):
+        """
+        Calculates conjugate for the Quaternion
+        :return: Quaternion which is conjugate of current quaternion
+        """
         quadruple = np.hstack((self.scalar_part(), -self.vector_part()))
         return Quaternion(quadruple)
 
@@ -87,21 +105,37 @@ class Quaternion(object):
             raise ValueError('Only another quaternion or number be subtracted from quaternion')
 
     def norm(self):
+        """
+        Calculates the norm of the Quaternion
+        :return: norm of Quaternion
+        """
         return norm(self.quadruple)
 
     def distance(self, other):
+        """
+        Calculates distance between two quaternions
+        :param other: other Quaternion
+        :return: distance to other Quaternion
+        """
         if isinstance(other, Quaternion):
             return (self - other).norm()
         else:
             raise ValueError('Only another quaternion can be subtracted from quaternion')
 
     def versor(self):
+        """
+        Return versor for current quaternion
+        :return: Quaternion which is versor for the given quaternion
+        """
         if not np.allclose(self.quadruple, np.zeros(4)):
             return 1 / self.norm() * self
         else:
             raise ZeroDivisionError('Zero quaternion has no versor')
 
     def reciprocal(self):
+        """
+        Return quaternion reciprocal to given
+        """
         if not np.allclose(self.quadruple, np.zeros(4)):
             return 1 / (self.norm() ** 2) * self.conjugate()
         else:
@@ -153,6 +187,9 @@ class Quaternion(object):
         v = n_hat * q_norm * np.sin(theta)
         self._set_quadruple(np.hstack((a, v)))
 
+    """
+    Property to get/set quaternion using polar notation
+    """
     polar = property(_get_polar, _set_polar)
 
     def __pow__(self, power):
@@ -165,7 +202,15 @@ class Quaternion(object):
             raise ValueError('Quaternions can be raised only into real-value power')
 
     def real_matrix(self):
+        """
+        Calculates real 4x4 matrix representation of the quaternion
+        :return: 4x4 real numpy array matrix
+        """
         return real_matrix(self.quadruple)
 
     def complex_matrix(self):
+        """
+        Calculates complex 2x2 matrix representation of the quaternion
+        :return: 2x2 complex numpy array matrix
+        """
         return complex_matrix(self.quadruple)

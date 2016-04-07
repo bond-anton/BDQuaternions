@@ -8,6 +8,11 @@ from Quaternions import Quaternion
 
 
 def exp(arg):
+    """
+    Calculate exponent function on quaternions and numbers
+    :param arg: Quaternion, number or array of both or mix
+    :return: exponent of Quaternion, number or array of both or mix
+    """
     if isinstance(arg, Quaternion):
         return Quaternion(q_exp(arg.quadruple))
     elif isinstance(arg, numbers.Number):
@@ -25,6 +30,11 @@ def exp(arg):
 
 
 def log(arg):
+    """
+    Calculate logarithm function on quaternions and numbers
+    :param arg: Quaternion, number or array of both or mix
+    :return: logarithm of Quaternion, number or array of both or mix
+    """
     if isinstance(arg, Quaternion):
         return Quaternion(q_log(arg.quadruple))
     elif isinstance(arg, numbers.Number):

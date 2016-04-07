@@ -99,34 +99,30 @@ def quaternion_from_rotation_matrix(matrix):
             raise ValueError('3x3 rotation matrix expected, got' + str(m))
         t = np.trace(m)
         if t > 3 * np.finfo(float).eps:
-            # print('t > 0')
             r = np.sqrt(1 + t)
             w = 0.5 * r
             s = 0.5 / r
-            x = (m[1, 2] - m[2, 1]) * s
-            y = (m[2, 0] - m[0, 2]) * s
-            z = (m[0, 1] - m[1, 0]) * s
+            x = (m[2, 1] - m[1, 2]) * s
+            y = (m[0, 2] - m[2, 0]) * s
+            z = (m[1, 0] - m[0, 1]) * s
         elif m[0, 0] >= m[1, 1] and m[0, 0] >= m[2, 2]:
-            # print('m[0, 0] > m[1, 1], m[2, 2]')
             r = np.sqrt(1 + m[0, 0] - m[1, 1] - m[2, 2])
             s = 0.5 / r
-            w = (m[1, 2] - m[2, 1]) * s
+            w = (m[2, 1] - m[1, 2]) * s
             x = 0.5 * r
             y = (m[0, 1] + m[1, 0]) * s
             z = (m[2, 0] + m[0, 2]) * s
         elif m[1, 1] >= m[2, 2]:
-            # print('m[1, 1] > m[2, 2]')
             r = np.sqrt(1 + m[1, 1] - m[0, 0] - m[2, 2])
             s = 0.5 / r
-            w = (m[2, 0] - m[0, 2]) * s
+            w = (m[0, 2] - m[2, 0]) * s
             x = (m[0, 1] + m[1, 0]) * s
             y = 0.5 * r
             z = (m[1, 2] + m[2, 1]) * s
         else:
-            # print('m[2, 2] > m[1, 1], m[0, 0]')
             r = np.sqrt(1 + m[2, 2] - m[0, 0] - m[1, 1])
             s = 0.5 / r
-            w = (m[0, 1] - m[1, 0]) * s
+            w = (m[1, 0] - m[0, 1]) * s
             x = (m[2, 0] + m[0, 2]) * s
             y = (m[1, 2] + m[2, 1]) * s
             z = 0.5 * r
@@ -166,12 +162,10 @@ def log(quadruple):
     """
     quadruple = check_quadruple(quadruple)
     q_norm = norm(quadruple)
-    #print('Q norm =', q_norm)
     if not np.allclose(q_norm, [0.0]):
         a = quadruple[0]
         v = quadruple[1:]
         v_norm = np.sqrt(np.sum(v * v))
-        #print('V norm =', v_norm)
         result_quadruple = np.zeros(4)
         result_quadruple[0] = np.log(q_norm)
         if not np.allclose(v_norm, [0.0]):

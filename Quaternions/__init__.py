@@ -2,3 +2,4 @@ from _version import __version__
 from Quaternion import Quaternion
 from UnitQuaternion import UnitQuaternion
 from Rotation import Rotation
+from _euler_angles_conventions import list_euler_angles_conventions

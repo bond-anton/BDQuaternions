@@ -8,6 +8,10 @@ from Quaternions import Quaternion, UnitQuaternion, Rotation
 
 
 def random_rotation():
+    """
+    Calculates random rotation quaternion
+    :return: random Rotation
+    """
     quadruple = np.array([1, 0, 0, 0], dtype=np.float)
     random_quadruple_norm = 1.0
     while True:
@@ -20,6 +24,10 @@ def random_rotation():
 
 
 def random_unit_quaternion():
+    """
+    Calculates random unit quaternion
+    :return: random UnitQuaternion
+    """
     quadruple = np.array([1, 0, 0, 0], dtype=np.float)
     random_quadruple_norm = 1.0
     while True:
@@ -32,6 +40,10 @@ def random_unit_quaternion():
 
 
 def random_quaternion(quadruple_norm=None):
+    """
+    Calculates random quaternion
+    :return: random Quaternion
+    """
     quadruple = np.array([1, 0, 0, 0], dtype=np.float)
     random_quadruple_norm = 1
     nonzero = False
@@ -51,6 +63,10 @@ def random_quaternion(quadruple_norm=None):
 
 
 def random_rotations_array(shape):
+    """
+    Calculates random rotation quaternions array
+    :return: random Rotation array of given shape
+    """
     rotations = np.empty(shape, dtype=object)
     size = rotations.size
     rotations = rotations.ravel()
@@ -60,6 +76,10 @@ def random_rotations_array(shape):
 
 
 def random_unit_quaternions_array(shape):
+    """
+    Calculates random unit quaternions array
+    :return: random UnitQuaternion array of given shape
+    """
     unit_quaternions = np.empty(shape, dtype=object)
     size = unit_quaternions.size
     unit_quaternions = unit_quaternions.ravel()
@@ -69,6 +89,10 @@ def random_unit_quaternions_array(shape):
 
 
 def random_quaternions_array(shape, quadruple_norm=None):
+    """
+    Calculates random quaternions array
+    :return: random Quaternion array of given shape
+    """
     quaternions = np.empty(shape, dtype=object)
     size = quaternions.size
     quaternions = quaternions.ravel()

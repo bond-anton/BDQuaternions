@@ -1,4 +1,4 @@
-from __future__ import division
+from __future__ import division, print_function
 import numpy as np
 
 """
@@ -27,7 +27,7 @@ default_convention = 'XYZs'
 Dictionary of Euler angles conventions
 variants should be lower-cased possible list of synonyms of the convention
 """
-conventions = {
+special_conventions = {
     # special named conventions
     'Nautical': {'variants': ('nautical', 'aircraft', 'cardan'),
                  'axes': 'ZYXr',
@@ -49,6 +49,9 @@ conventions = {
             'axes_labels': ('RD', 'TD', 'ND'),
             'labels': ('Psi', 'Theta', 'Phi'),
             'description': 'Roe (Psi, Theta, Phi) RD,TD,ND convention (ZYZr)'},
+}
+
+general_conventions = {
     # General conventions in the axes names notation XYZr or ZXZs. r/s means rotating or static frame
     # static frame conventions
     'XYZs': {'variants': ('xyzs', 'sxyz'),
@@ -197,12 +200,46 @@ derived_conventions = {
                'labels': ('omega', 'Theta', 'phi'),
                'from_parent': lambda Psi, Theta, Phi: (np.pi / 2 - Psi, Theta, 3 * np.pi / 2 - Phi),
                'to_parent': lambda omega, Theta, phi: (np.pi / 2 - omega, Theta, 3 * np.pi / 2 - phi),
-               'description': 'Canova (omega, Theta, phi) convention'},
-    'Synthetic 1': {'variants': ('synthetic 1', 'synthetic_1', 'synthetic1',),
-                    'parent_convention': 'Canova',
-                    'axes_labels': ('RD', 'TD', 'ND'),
-                    'labels': ('omega_1', 'theta', 'phi_1'),
-                    'from_parent': lambda omega, Theta, phi: (2 * omega, Theta + 1, 3 * phi),
-                    'to_parent': lambda omega_1, theta, phi_1: (omega_1 / 2, theta - 1, phi_1 / 3),
-                    'description': 'Syntetic useless (omega_1, theta, phi_1) convention for testing purposes'}
+               'description': 'Canova (omega, Theta, phi) convention'}
 }
+
+
+def list_euler_angles_conventions(filter=None):
+    """
+    Function to get list of available conventions
+    :param filter: None to select all or list of filtering strings: 'general', 'special', 'derived'
+    :return: list of conventions
+    """
+    general = general_conventions.keys()
+    special = special_conventions.keys()
+    derived = derived_conventions.keys()
+    if filter is None:
+        final_list = general + special + derived
+    elif isinstance(filter, str):
+        if 'general' == filter.strip():
+            final_list = general
+        elif 'special' == filter.strip():
+            final_list = special
+        elif 'derived' == filter.strip():
+            final_list = derived
+        else:
+            final_list = general + special + derived
+            print('Expected list or any of known filter words [\'general\', \'special\', \'derived\'] or None.')
+            print('Falling back to complete list')
+    elif isinstance(filter, (list, tuple, np.ndarray)):
+        final_list = []
+        if 'general' in filter:
+            final_list += general
+        if 'special' in filter:
+            final_list += special
+        if 'derived' in filter:
+            final_list += derived
+        if not final_list:
+            final_list = general + special + derived
+            print('Expected list or any of known filter words [\'general\', \'special\', \'derived\'] or None.')
+            print('Falling back to complete list')
+    else:
+        final_list = general + special + derived
+        print('Expected list of known filter words [\'general\', \'special\', \'derived\'] or None.')
+        print('Falling back to complete list')
+    return final_list

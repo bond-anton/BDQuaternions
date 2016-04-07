@@ -2,7 +2,7 @@ from __future__ import division, print_function
 import numpy as np
 
 from _quaternion_operations import quaternion_to_rotation_matrix
-from _euler_angles_conventions import conventions, derived_conventions, default_convention,\
+from _euler_angles_conventions import general_conventions, special_conventions, derived_conventions, default_convention,\
     euler_angles_codes, euler_next_axis
 
 """
@@ -18,6 +18,8 @@ def check_euler_angles_convention(convention):
     :param convention: string with short form of convention e.g. 'XYZs' or 'Bunge'
     :return: dict describing convention
     """
+    conventions = general_conventions.copy()
+    conventions.update(special_conventions)
     euler_angles_convention = conventions[default_convention]
     if convention is not None:
         match = False

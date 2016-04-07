@@ -34,7 +34,7 @@ class TestQuaternionOperations(unittest.TestCase):
         np.testing.assert_allclose(qo.complex_matrix(q), np.eye(2))
 
     def test_quaternion_to_rotation_matrix(self):
-        for i in range(1):
+        for i in range(100):
             q = qo.check_quadruple((np.random.random(4) - 0.5) * 2)
             while qo.norm(q) == 0:
                 q = qo.check_quadruple(np.random.random(4))
@@ -42,12 +42,15 @@ class TestQuaternionOperations(unittest.TestCase):
             np.testing.assert_allclose(qo.norm(q_n), [1])
             r_m = qo.quaternion_to_rotation_matrix(q)
             r_m_n = qo.quaternion_to_rotation_matrix(q_n)
-            #np.testing.assert_allclose(r_m, r_m_n)
-            #np.testing.assert_allclose(qo.quaternion_from_rotation_matrix(r_m), q_n)
-            #np.testing.assert_allclose(qo.quaternion_from_rotation_matrix(r_m_n), q_n)
+            np.testing.assert_allclose(r_m, r_m_n)
+            q_m = qo.quaternion_from_rotation_matrix(r_m)
+            q_m_n = qo.quaternion_from_rotation_matrix(r_m_n)
+            self.assertTrue(np.allclose(q_m, q_n) or np.allclose(q_m, -q_n))
+            self.assertTrue(np.allclose(q_m_n, q_n) or np.allclose(q_m_n, -q_n))
 
     def test_log_and_exp(self):
-        q = qo.check_quadruple((np.random.random(4) - 0.5) * 2)
+        magnitude = 2
+        q = qo.check_quadruple((np.random.random(4) - 0.5) * 2 * magnitude)
         exp_q = qo.exp(q)
         log_q = qo.log(q)
         np.testing.assert_allclose(qo.log(exp_q), q)

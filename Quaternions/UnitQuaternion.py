@@ -8,6 +8,9 @@ from Quaternions import Quaternion
 
 
 class UnitQuaternion(Quaternion):
+    """
+    Sub-class of Quaternion to deal with unit quaternions (of norm == 1)
+    """
 
     def __init__(self, quadruple=None):
         if quadruple is None:
@@ -17,8 +20,19 @@ class UnitQuaternion(Quaternion):
         super(UnitQuaternion, self).__init__(quadruple)
 
     def conjugate(self):
+        """
+        Calculates conjugate for the Unit Quaternion
+        :return: Unit Quaternion which is conjugate of current unit quaternion
+        """
         quadruple = np.hstack((self.scalar_part(), -self.vector_part()))
         return UnitQuaternion(quadruple)
+
+    def reciprocal(self):
+        """
+        for Unit quaternion reciprocal is equal to conjugate
+        :return: Unit quaternion reciprocal to current quaternion
+        """
+        return self.conjugate()
 
     def __mul__(self, other):
         if isinstance(other, UnitQuaternion):

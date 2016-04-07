@@ -1,22 +1,28 @@
 from __future__ import division, print_function
 import numpy as np
 
+from Quaternions import Rotation
 from Quaternions import _quaternion_operations as qo
 
-q = qo.check_quadruple((np.random.random(4) - 0.5) * 2)
-while qo.norm(q) == 0:
-    q = qo.check_quadruple(np.random.random(4))
-q_n = q / qo.norm(q)
 
-v = np.array([1, 1, 1])
+count = 0
+while count < 5:
+    q = qo.check_quadruple((np.random.random(4) - 0.5) * 2)
+    while qo.norm(q) == 0:
+        q = qo.check_quadruple(np.random.random(4))
+    q_n = q / qo.norm(q)
 
-
-np.testing.assert_allclose(qo.norm(q_n), [1])
-r_m = qo.quaternion_to_rotation_matrix(q)
-r_m_n = qo.quaternion_to_rotation_matrix(q_n)
-print('Comparison of rot matrices: r_m == r_m_n: ', np.allclose(r_m, r_m_n))
-q_m = qo.quaternion_from_rotation_matrix(r_m)
-print('Comparison of quaternions from rot. matrix:', np.allclose(q_n, q_m))
-# print(q_n - q_m)
-print(q_n)
-print(q_m)
+    r_m = qo.quaternion_to_rotation_matrix(q)
+    q_m = qo.quaternion_from_rotation_matrix(r_m)
+    t = np.trace(r_m)
+    if t <= 0 and r_m[1, 1] < r_m[2, 2]:
+        print('Comparison of quaternions from rot. matrix:', np.allclose(q_n, q_m) or np.allclose(q_n, -q_m))
+        # print(q_n - q_m)
+        rotation_1 = Rotation(q_n)
+        rotation_2 = Rotation(q_m)
+        axis_1, angle_1 = rotation_1.axis_angle
+        axis_2, angle_2 = rotation_2.axis_angle
+        print('was:', q_n, axis_1, np.rad2deg(angle_1))
+        print('now:', q_m, axis_2, np.rad2deg(angle_2))
+        print(np.dot(axis_1, axis_2))
+        count += 1
