@@ -25,7 +25,7 @@ setup(
     name=package_name,
     version=version_string,
 
-    description='Package for calculations with Quaternions',
+    description='Package for manipulations with Quaternions',
     long_description=long_description,
 
     url='https://github.com/bond-anton/Quaternions',
