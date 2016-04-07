@@ -5,6 +5,7 @@
 Available classes are
 * Quaternion
 * UnitQuaternion
+* Rotation
 
 ## Installation
 
