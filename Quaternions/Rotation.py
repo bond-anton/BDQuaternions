@@ -20,6 +20,12 @@ class Rotation(UnitQuaternion):
         super(Rotation, self).__init__(quadruple)
         self._set_euler_angles_convention(euler_angles_convention)
 
+    def __eq__(self, other):
+        if isinstance(other, Rotation):
+            return np.allclose(self.quadruple, other.quadruple) or np.allclose(self.quadruple, -other.quadruple)
+        else:
+            raise ValueError('Only another quaternion can be compared to given quaternion')
+
     def conjugate(self):
         quadruple = np.hstack((self.scalar_part(), -self.vector_part()))
         return Rotation(quadruple, euler_angles_convention=self.euler_angles_convention['title'])
