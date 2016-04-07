@@ -40,6 +40,10 @@ class Rotation(UnitQuaternion):
         return axis, theta * 2
 
     def _set_axis_angle(self, (axis, theta)):
+        axis = np.array(axis, dtype=np.float)
+        axis_norm = np.sqrt(np.sum(axis * axis))
+        if axis_norm > 0:
+            axis /= axis_norm
         self.polar = 1, axis, theta / 2
 
     axis_angle = property(_get_axis_angle, _set_axis_angle)

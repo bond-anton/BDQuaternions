@@ -1,5 +1,8 @@
+from __future__ import division
+import numpy as np
+
 """
-after Ken Shoemake in Graphics Gems IV (Academic Press, 1994), p. 222
+description of rotations after Ken Shoemake in Graphics Gems IV (Academic Press, 1994), p. 222
 """
 
 euler_next_axis = (1, 2, 0, 1)
@@ -22,9 +25,10 @@ default_convention = 'XYZs'
 
 """
 Dictionary of Euler angles conventions
+variants should be lower-cased possible list of synonyms of the convention
 """
 conventions = {
-    # special conventions
+    # special named conventions
     'Nautical': {'variants': ('nautical', 'aircraft', 'cardan'),
                  'axes': 'ZYXr',
                  'axes_labels': ('roll', 'pitch', 'yaw'),
@@ -37,6 +41,7 @@ conventions = {
               'description': 'Bunge (phi1 Phi phi2) ZXZr convention'},
     'Matthies': {'variants': ('matthies', 'nfft', 'abg'),
                  'axes': 'ZYZr',
+                 'axes_labels': ('X', 'Y', 'Z'),
                  'labels': ('alpha', 'beta', 'gamma'),
                  'description': 'Matthies (alpha beta gamma) ZYZr convention'},
     'Roe': {'variants': ('roe',),
@@ -44,14 +49,7 @@ conventions = {
             'axes_labels': ('RD', 'TD', 'ND'),
             'labels': ('Psi', 'Theta', 'Phi'),
             'description': 'Roe (Psi, Theta, Phi) RD,TD,ND convention (ZYZr)'},
-    # 'Kocks': {'variants': ('kocks',),
-    #           'axes_labels': ('X', 'Y', 'Z'),
-    #          'labels': ('Psi', 'Theta', 'phi'),
-    #          'description': 'Kocks (Psi Theta phi) convention'},
-    # 'Canova': {'variants': ('canova',),
-    #            'axes_labels': ('X', 'Y', 'Z'),
-    #           'labels': ('omega', 'Theta', 'phi'),
-    #           'description': 'Canova (omega, Theta, phi) convention'},
+    # General conventions in the axes names notation XYZr or ZXZs. r/s means rotating or static frame
     # static frame conventions
     'XYZs': {'variants': ('xyzs', 'sxyz'),
              'axes': 'XYZs',
@@ -174,4 +172,37 @@ conventions = {
              'axes_labels': ('X', 'Y', 'Z'),
              'labels': ('theta_1', 'theta_2', 'theta_3'),
              'description': 'ZYZ rotating frame convention'}
+}
+
+"""
+Dictionary of derived Euler angles conventions.
+Those that use rotations with changing directions,
+but can be derived from another 'standard' rotational Euler angles convention.
+Variants should be lower-cased possible list of synonyms of the convention.
+from_parent is the routine to convert from parent convention Euler angles to the described.
+to_parent is the routine to convert to parent convention Euler angles from the described.
+"""
+derived_conventions = {
+    # 'symmetrical angles' conventions used in crystallographic texture analysis
+    'Kocks': {'variants': ('kocks',),
+              'parent_convention': 'Roe',
+              'axes_labels': ('RD', 'TD', 'ND'),
+              'labels': ('Psi', 'Theta', 'phi'),
+              'from_parent': lambda Psi, Theta, Phi: (Psi, Theta, np.pi - Phi),
+              'to_parent': lambda Psi, Theta, phi: (Psi, Theta, np.pi - phi),
+              'description': 'Kocks (Psi Theta phi) convention'},
+    'Canova': {'variants': ('canova',),
+               'parent_convention': 'Roe',
+               'axes_labels': ('RD', 'TD', 'ND'),
+               'labels': ('omega', 'Theta', 'phi'),
+               'from_parent': lambda Psi, Theta, Phi: (np.pi / 2 - Psi, Theta, 3 * np.pi / 2 - Phi),
+               'to_parent': lambda omega, Theta, phi: (np.pi / 2 - omega, Theta, 3 * np.pi / 2 - phi),
+               'description': 'Canova (omega, Theta, phi) convention'},
+    'Synthetic 1': {'variants': ('synthetic 1', 'synthetic_1', 'synthetic1',),
+                    'parent_convention': 'Canova',
+                    'axes_labels': ('RD', 'TD', 'ND'),
+                    'labels': ('omega_1', 'theta', 'phi_1'),
+                    'from_parent': lambda omega, Theta, phi: (2 * omega, Theta + 1, 3 * phi),
+                    'to_parent': lambda omega_1, theta, phi_1: (omega_1 / 2, theta - 1, phi_1 / 3),
+                    'description': 'Syntetic useless (omega_1, theta, phi_1) convention for testing purposes'}
 }

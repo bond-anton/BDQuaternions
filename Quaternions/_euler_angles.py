@@ -2,7 +2,8 @@ from __future__ import division, print_function
 import numpy as np
 
 from _quaternion_operations import quaternion_to_rotation_matrix
-from _euler_angles_conventions import euler_angles_codes, conventions, default_convention, euler_next_axis
+from _euler_angles_conventions import conventions, derived_conventions, default_convention,\
+    euler_angles_codes, euler_next_axis
 
 """
 Euler angles conversion algorithms after Ken Shoemake in Graphics Gems IV (Academic Press, 1994), p. 222
@@ -20,18 +21,91 @@ def check_euler_angles_convention(convention):
     euler_angles_convention = conventions[default_convention]
     if convention is not None:
         match = False
+        # first we search requested convention in the dict of 'standard' conventions
         for key in conventions.keys():
             if str(convention).lower().strip() in conventions[key]['variants']:
                 euler_angles_convention = conventions[key]
                 euler_angles_convention['title'] = key
+                euler_angles_convention['parent_convention'] = None
+                euler_angles_convention['parent'] = None
+                euler_angles_convention['code'] = euler_angles_codes[euler_angles_convention['axes']]
+                match = True
+                break
+        # If not found we look through the dict of 'derived' conventions
+        for key in derived_conventions.keys():
+            if str(convention).lower().strip() in derived_conventions[key]['variants']:
+                euler_angles_convention = derived_conventions[key]
+                euler_angles_convention['title'] = key
+                parent_convention = check_euler_angles_convention(euler_angles_convention['parent_convention'])
+                euler_angles_convention['parent'] = parent_convention
                 match = True
                 break
         if not match:
             print('Convention: %s not found or not supported.' % convention)
             print('Falling back to default convention %s.' % default_convention)
-            euler_angles_convention['title'] = default_convention
-    euler_angles_convention['code'] = euler_angles_codes[euler_angles_convention['axes']]
+            euler_angles_convention = check_euler_angles_convention(default_convention)
+    else:
+        euler_angles_convention = check_euler_angles_convention(default_convention)
     return euler_angles_convention
+
+
+def print_euler_angles_conventions_tree(convention):
+    """
+    Theoretically derived conventions can be nested endless.
+    This function prints out the tree beginning from highest level parent convention.
+    :param convention: dict describing Euler angles convention
+    """
+    current_convention = convention
+    flat_parent_list = []
+    while current_convention['parent_convention'] is not None:
+        flat_parent_list.append(current_convention)
+        current_convention = current_convention['parent']
+    flat_parent_list.append(current_convention)
+    level = 0
+    while flat_parent_list:
+        current_convention = flat_parent_list.pop()
+        print('-' * level + ' ' * (level > 0) + current_convention['title'])
+        level += 1
+
+
+def euler_angles_in_parent_convention(ai, aj, ak, convention):
+    """
+    Theoretically derived conventions can be nested endless.
+    This function will bring the angles to the highest level parent convention.
+    :param ai: first Euler angle
+    :param aj: second Euler angle
+    :param ak: third Euler angle
+    :param convention: dict describing Euler angles convention
+    :return: ax, ay, az, parent_convention - three Euler angles and the parent convention dict
+    """
+    current_convention = convention
+    ax, ay, az = ai, aj, ak
+    while current_convention['parent_convention'] is not None:
+        ax, ay, az = current_convention['to_parent'](ax, ay, az)
+        current_convention = current_convention['parent']
+    return ax, ay, az, current_convention
+
+
+def euler_angles_from_parent_convention(ai, aj, ak, convention):
+    """
+    Theoretically derived conventions can be nested endless.
+    This function will bring the angles from the highest level parent convention to given.
+    :param ai: first Euler angle in most parent convention
+    :param aj: second Euler angle in most parent convention
+    :param ak: third Euler angle in most parent convention
+    :param convention: dict describing Euler angles convention
+    :return: ax, ay, az - three Euler angles in specified convention
+    """
+    ax, ay, az = ai, aj, ak
+    current_convention = convention
+    flat_parent_list = []
+    while current_convention['parent_convention'] is not None:
+        flat_parent_list.append(current_convention)
+        current_convention = current_convention['parent']
+    while flat_parent_list:
+        current_convention = flat_parent_list.pop()
+        ax, ay, az = current_convention['from_parent'](ax, ay, az)
+    return ax, ay, az
 
 
 def euler_angles_to_matrix(ai, aj, ak, convention):
@@ -43,22 +117,23 @@ def euler_angles_to_matrix(ai, aj, ak, convention):
     :param convention: dict describing Euler angles convention
     :return: 3x3 rotation matrix as numpy array of floats
     """
+    ax, ay, az, parent_convention = euler_angles_in_parent_convention(ai, aj, ak, convention)
     # the tuples in convention['code'] coding the inner axis (X - 0, Y - 1, Z - 2), parity (Even - 0, Odd - 1),
     # repetition (No - 0, Yes - 1), frame (0 - static; 1 - rotating frame)
-    inner_axis, parity, repetition, frame = convention['code']
+    inner_axis, parity, repetition, frame = parent_convention['code']
     i = inner_axis
     j = euler_next_axis[i + parity]
     k = euler_next_axis[i - parity + 1]
     if frame:
-        ai, ak = ak, ai
+        ax, az = az, ax
     if parity:
-        ai, aj, ak = -ai, -aj, -ak
-    ci = np.cos(ai)
-    si = np.sin(ai)
-    cj = np.cos(aj)
-    sj = np.sin(aj)
-    ck = np.cos(ak)
-    sk = np.sin(ak)
+        ax, ay, az = -ax, -ay, -az
+    ci = np.cos(ax)
+    si = np.sin(ax)
+    cj = np.cos(ay)
+    sj = np.sin(ay)
+    ck = np.cos(az)
+    sk = np.sin(az)
 
     m = np.identity(3)
     if repetition:
@@ -91,9 +166,10 @@ def euler_angles_from_matrix(matrix, convention):
     :param convention: dict describing Euler angles convention
     :return: ax, ay, az three Euler angles
     """
+    ax, ay, az, parent_convention = euler_angles_in_parent_convention(0, 0, 0, convention)
     # the tuples in convention['code'] coding the inner axis (X - 0, Y - 1, Z - 2), parity (Even - 0, Odd - 1),
     # repetition (No - 0, Yes - 1), frame (0 - static; 1 - rotating frame)
-    inner_axis, parity, repetition, frame = convention['code']
+    inner_axis, parity, repetition, frame = parent_convention['code']
     i = inner_axis
     j = euler_next_axis[i + parity]
     k = euler_next_axis[i - parity + 1]
@@ -122,7 +198,7 @@ def euler_angles_from_matrix(matrix, convention):
         ax, ay, az = -ax, -ay, -az
     if frame:
         ax, az = az, ax
-    return ax, ay, az
+    return euler_angles_from_parent_convention(ax, ay, az, convention)
 
 
 def euler_angles_to_quaternion(ai, aj, ak, convention):
@@ -134,25 +210,26 @@ def euler_angles_to_quaternion(ai, aj, ak, convention):
     :param convention: dict describing Euler angles convention
     :return: Quaternion as numpy array of for floats [w*1, x*i, y*j, z*k]
     """
+    ax, ay, az, parent_convention = euler_angles_in_parent_convention(ai, aj, ak, convention)
     # the tuples in convention['code'] coding the inner axis (X - 0, Y - 1, Z - 2), parity (Even - 0, Odd - 1),
     # repetition (No - 0, Yes - 1), frame (0 - static; 1 - rotating frame)
-    inner_axis, parity, repetition, frame = convention['code']
+    inner_axis, parity, repetition, frame = parent_convention['code']
     i = inner_axis + 1
     j = euler_next_axis[i + parity - 1] + 1
     k = euler_next_axis[i - parity] + 1
     if frame:
-        ai, ak = ak, ai
+        ax, az = az, ax
     if parity:
-        aj = -aj
-    ai /= 2
-    aj /= 2
-    ak /= 2
-    ci = np.cos(ai)
-    si = np.sin(ai)
-    cj = np.cos(aj)
-    sj = np.sin(aj)
-    ck = np.cos(ak)
-    sk = np.sin(ak)
+        ay = -ay
+    ax /= 2
+    ay /= 2
+    az /= 2
+    ci = np.cos(ax)
+    si = np.sin(ax)
+    cj = np.cos(ay)
+    sj = np.sin(ay)
+    ck = np.cos(az)
+    sk = np.sin(az)
 
     quadruple = np.zeros(4, dtype=np.float)
     if repetition:

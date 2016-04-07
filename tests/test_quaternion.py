@@ -13,13 +13,13 @@ class TestQuaternion(unittest.TestCase):
         self.q2 = Quaternion(np.array([1, 2, 3, 4]))
 
     def test_quaternion_constructor(self):
-        np.testing.assert_allclose(self.q1.quadruples, np.array([0, 0, 0, 1]))
+        np.testing.assert_allclose(self.q1.quadruple, np.array([0, 0, 0, 1]))
         self.assertRaises(ValueError, Quaternion, np.array([0, 0, 0]))
         self.assertRaises(ValueError, Quaternion, 'xxx')
 
     def test_scalar_vector_part(self):
-        np.testing.assert_allclose(self.q1.scalar_part(), self.q1.quadruples[0])
-        np.testing.assert_allclose(self.q1.vector_part(), self.q1.quadruples[1:])
+        np.testing.assert_allclose(self.q1.scalar_part(), self.q1.quadruple[0])
+        np.testing.assert_allclose(self.q1.vector_part(), self.q1.quadruple[1:])
 
     def test_multiplication(self):
         r1 = self.q1.scalar_part()
@@ -30,8 +30,8 @@ class TestQuaternion(unittest.TestCase):
         v3 = r1 * v2 + r2 * v1 + np.cross(v1, v2)
         quadruple = np.array(np.hstack((r3, v3)))
         np.testing.assert_allclose((self.q1 * self.q2).quadruple, quadruple)
-        np.testing.assert_allclose((self.q1 * 3).quadruple, self.q1.quadruples * 3)
-        np.testing.assert_allclose((3 * self.q1).quadruple, self.q1.quadruples * 3)
+        np.testing.assert_allclose((self.q1 * 3).quadruple, self.q1.quadruple * 3)
+        np.testing.assert_allclose((3 * self.q1).quadruple, self.q1.quadruple * 3)
 
     def test_addition(self):
         np.testing.assert_allclose((self.q1 + self.q2).quadruple, np.array([1, 2, 3, 5]))

@@ -146,6 +146,7 @@ class Quaternion(object):
             return 0, np.zeros(3), 0
 
     def _set_polar(self, (q_norm, n_hat, theta)):
+        n_hat = np.array(n_hat, dtype=np.float)
         assert q_norm >= 0
         assert np.allclose(np.sqrt(np.sum(n_hat * n_hat)), [1.0])
         a = q_norm * np.cos(theta)
