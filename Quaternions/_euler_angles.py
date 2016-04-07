@@ -6,10 +6,17 @@ from _euler_angles_conventions import euler_angles_codes, conventions, default_c
 
 """
 Euler angles conversion algorithms after Ken Shoemake in Graphics Gems IV (Academic Press, 1994), p. 222
+
+All angles are in radians y default
 """
 
 
 def check_euler_angles_convention(convention):
+    """
+    returns euler_angles convention as a dict
+    :param convention: string with short form of convention e.g. 'XYZs' or 'Bunge'
+    :return: dict describing convention
+    """
     euler_angles_convention = conventions[default_convention]
     if convention is not None:
         match = False
@@ -28,6 +35,14 @@ def check_euler_angles_convention(convention):
 
 
 def euler_angles_to_matrix(ai, aj, ak, convention):
+    """
+    Convert Euler angles to rotation matrix
+    :param ai: first Euler angle
+    :param aj: second Euler angle
+    :param ak: third Euler angle
+    :param convention: dict describing Euler angles convention
+    :return: 3x3 rotation matrix as numpy array of floats
+    """
     # the tuples in convention['code'] coding the inner axis (X - 0, Y - 1, Z - 2), parity (Even - 0, Odd - 1),
     # repetition (No - 0, Yes - 1), frame (0 - static; 1 - rotating frame)
     inner_axis, parity, repetition, frame = convention['code']
@@ -70,6 +85,12 @@ def euler_angles_to_matrix(ai, aj, ak, convention):
 
 
 def euler_angles_from_matrix(matrix, convention):
+    """
+    convert rotation matrix to Euler angles
+    :param matrix: 3x3 rotation matrix
+    :param convention: dict describing Euler angles convention
+    :return: ax, ay, az three Euler angles
+    """
     # the tuples in convention['code'] coding the inner axis (X - 0, Y - 1, Z - 2), parity (Even - 0, Odd - 1),
     # repetition (No - 0, Yes - 1), frame (0 - static; 1 - rotating frame)
     inner_axis, parity, repetition, frame = convention['code']
@@ -105,6 +126,14 @@ def euler_angles_from_matrix(matrix, convention):
 
 
 def euler_angles_to_quaternion(ai, aj, ak, convention):
+    """
+    Convert Euler angles to quaternion
+    :param ai: first Euler angle
+    :param aj: second Euler angle
+    :param ak: third Euler angle
+    :param convention: dict describing Euler angles convention
+    :return: Quaternion as numpy array of for floats [w*1, x*i, y*j, z*k]
+    """
     # the tuples in convention['code'] coding the inner axis (X - 0, Y - 1, Z - 2), parity (Even - 0, Odd - 1),
     # repetition (No - 0, Yes - 1), frame (0 - static; 1 - rotating frame)
     inner_axis, parity, repetition, frame = convention['code']
@@ -142,5 +171,25 @@ def euler_angles_to_quaternion(ai, aj, ak, convention):
 
 
 def euler_angles_from_quaternion(quadruple, convention):
+    """
+    Convert Quaternion to Euler angles
+    :param quadruple: Quaternion as numpy array of for floats [w*1, x*i, y*j, z*k]
+    :param convention: dict describing Euler angles convention
+    :return: ax, ay, az three Euler angles
+    """
     matrix = quaternion_to_rotation_matrix(quadruple)
     return euler_angles_from_matrix(matrix, convention)
+
+
+def change_euler_angles_convention(ai, aj, ak, convention, new_convention):
+    """
+    Convert Euler angles from given to new convention
+    :param ai: first Euler angle
+    :param aj: second Euler angle
+    :param ak: third Euler angle
+    :param convention: dict describing current Euler angles convention
+    :param new_convention: dict describing new Euler angles convention
+    :return: ax, ay, az three Euler angles
+    """
+    matrix = euler_angles_to_matrix(ai, aj, ak, convention)
+    return euler_angles_from_matrix(matrix, new_convention)

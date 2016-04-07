@@ -4,39 +4,29 @@ import numpy as np
 from Quaternions import Quaternion
 from Quaternions import functions as qf
 
-q1 = Quaternion()
-q2 = Quaternion(np.array([1, 2, 3, 4]))
-print('Quaternions:', q1, q2)
-print('Scalar part:', q1.scalar_part())
-print('Vector part:', q1.vector_part())
+q1 = Quaternion(np.array([[[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1]],
+                          [[1, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1]],
+                          [[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1]]]))
+print('Q1:')
+print(q1)
 
+print('Q1 norm:')
+print(q1.norm())
 
-print('q1* =', q1.conjugate())
-print('q2* =', q2.conjugate())
-print('q1 + q2 =', q1 + q2)
-print('q1 - q2 =', q1 - q2)
-print('q1 * q2 =', q1 * q2)
-print('q1 == q2:', q1 == q2, '\tq1 == q1:', q1 == q1)
-print('||q1|| =', q1.norm())
-print('||q2|| =', q2.norm())
-print('distance d(q1,q2) =', q1.distance(q2))
-print('q1 versor =', q1.versor())
-print('q2 versor =', q2.versor())
-print('q1 reciprocal =', q1.reciprocal())
-print('q2 reciprocal =', q2.reciprocal())
-print('q1 / 3 =', q1 / 3)
-print('3 / q2 =', 3 / q2)
-print('q1 real matrix:\n', q1.real_matrix())
-print('q1 complex matrix:\n', q1.complex_matrix())
-print('q1 polar representation:', q1.polar)
-print('q2 polar representation:', q2.polar)
-print('q1^3 =', q1 ** 3)
-print('q2^3 =', q2 ** 3)
-print('exp(q1) =', qf.exp(q1))
-print('exp(q2) =', qf.exp(q2))
-print('log(q1) =', qf.log(q1))
-print('log(q2) =', qf.log(q2))
-print('exp(log(q1)) =', qf.exp(qf.log(q1)))
-print('exp(log(q2)) =', qf.exp(qf.log(q2)))
-print('log(exp(q1)) =', qf.log(qf.exp(q1)))
-print('log(exp(q2)) =', qf.log(qf.exp(q2)))
+q2 = Quaternion([1, 2, 3, 4])
+print('Q2:')
+print(q2)
+print('Q2 norm:')
+print(q2.norm())
+
+print('Q1 + Q2:')
+print(q1 + q2)
+
+print('Q1 - Q2:')
+print(q1 - q2)
+
+print('Q1 * Q2:')
+print(q1 * q2)
+
+print('Q1 versor:')
+print(q1.versor())
