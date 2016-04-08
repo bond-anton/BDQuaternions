@@ -100,7 +100,8 @@ class Rotation(UnitQuaternion):
     def _get_euler_angles(self):
         return euler_angles_from_quaternion(self.quadruple, self.euler_angles_convention)
 
-    def _set_euler_angles(self, (ai, aj, ak)):
+    def _set_euler_angles(self, euler_angles_components):
+        ai, aj, ak = euler_angles_components
         quadruple = euler_angles_to_quaternion(ai, aj, ak, self.euler_angles_convention)
         self.quadruple = quadruple
 
