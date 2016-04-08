@@ -2,7 +2,7 @@ from __future__ import division, print_function
 import numpy as np
 import numbers
 
-from _quaternion_operations import check_quadruple, mul, norm, real_matrix, complex_matrix
+from Quaternions._quaternion_operations import check_quadruple, mul, norm, real_matrix, complex_matrix
 
 
 class Quaternion(object):
