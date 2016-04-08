@@ -2,7 +2,7 @@ from __future__ import division, print_function
 import numbers
 import numpy as np
 
-from _quaternion_operations import exp as q_exp, log as q_log
+from Quaternions._quaternion_operations import exp as q_exp, log as q_log
 
 from Quaternions import Quaternion
 

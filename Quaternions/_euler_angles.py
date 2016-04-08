@@ -1,9 +1,9 @@
 from __future__ import division, print_function
 import numpy as np
 
-from _quaternion_operations import quaternion_to_rotation_matrix
-from _euler_angles_conventions import general_conventions, special_conventions, derived_conventions, default_convention,\
-    euler_angles_codes, euler_next_axis
+from Quaternions._quaternion_operations import quaternion_to_rotation_matrix
+from Quaternions._euler_angles_conventions import general_conventions, special_conventions, derived_conventions,\
+    default_convention, euler_angles_codes, euler_next_axis
 
 """
 Euler angles conversion algorithms after Ken Shoemake in Graphics Gems IV (Academic Press, 1994), p. 222

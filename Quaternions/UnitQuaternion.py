@@ -2,7 +2,7 @@ from __future__ import division, print_function
 import numbers
 import numpy as np
 
-from _quaternion_operations import check_quadruple, mul
+from Quaternions._quaternion_operations import check_quadruple, mul
 
 from Quaternions import Quaternion
 

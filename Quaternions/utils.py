@@ -2,7 +2,7 @@ from __future__ import division, print_function
 import numbers
 import numpy as np
 
-from _quaternion_operations import norm
+from Quaternions._quaternion_operations import norm
 
 from Quaternions import Quaternion, UnitQuaternion, Rotation
 
