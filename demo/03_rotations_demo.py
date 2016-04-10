@@ -18,5 +18,3 @@ print(list_euler_angles_conventions('special'))
 print(list_euler_angles_conventions('derived'))
 print(list_euler_angles_conventions(['special', 'derived']))
 print(list_euler_angles_conventions('general'))
-
-print(rotation.rotate([1, 0, 0]))
