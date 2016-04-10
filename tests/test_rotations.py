@@ -45,3 +45,10 @@ class TestRotation(unittest.TestCase):
         v_r_m = np.dot(m2, v)
         v_r_q = (self.q1 * qv * self.q1.reciprocal()).quadruple[1:]
         np.testing.assert_allclose(v_r_m, v_r_q, atol=np.finfo(float).eps * 4)
+
+    def test_rotate(self):
+        np.testing.assert_allclose(self.q1.rotate([1, 0, 0]), [1, 0, 0])
+        self.q1.axis_angle = ([0, 0, 1], np.pi / 2)
+        self.q1.euler_angles_convention = 'Bunge'
+        self.q1.euler_angles = [np.pi/2, 0, 0]
+        np.testing.assert_allclose(self.q1.rotate([1, 0, 0]), [0, 1, 0], atol=np.finfo(float).eps * 4)

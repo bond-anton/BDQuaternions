@@ -33,7 +33,7 @@ class Rotation(UnitQuaternion):
 
     def conjugate(self):
         """
-        Calculates conjugate for the Roattion quaternion
+        Calculates conjugate for the Rotation quaternion
         :return: Rotation quaternion which is conjugate of current quaternion
         """
         quadruple = np.hstack((self.scalar_part(), -self.vector_part()))
@@ -135,3 +135,25 @@ class Rotation(UnitQuaternion):
             return other * self
         else:
             raise ValueError('Rotation can be multiplied only by another rotation')
+
+    def rotate(self, xyz):
+        """
+        Apply rotation to vector or array of vectors
+        :param xyz: vector or array of vectors
+        :return: rotated vector or array of vectors
+        """
+        xyz = np.array(xyz, dtype=np.float)
+        if len(xyz.shape) == 2:
+            if xyz.shape[1] != 3 and xyz.shape[0] == 3:
+                xyz = xyz.T
+            elif 3 not in xyz.shape:
+                raise ValueError('Input must be a single point or an array of points coordinates with shape Nx3')
+        elif len(xyz.shape) == 1 and xyz.size == 3:
+            xyz = xyz.reshape(1, 3)
+        else:
+            raise ValueError('Input must be a single point or an array of points coordinates with shape Nx3')
+        result = np.dot(self.rotation_matrix, xyz.T).T
+        if xyz.size == 3:
+            return result[0]
+        else:
+            return result

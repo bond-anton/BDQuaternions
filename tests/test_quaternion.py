@@ -72,7 +72,7 @@ class TestQuaternion(unittest.TestCase):
         self.assertEqual(3 / self.q1, 3 * self.q1.reciprocal())
 
     def test_exp_and_log(self):
-        components_magnitude = 2
+        components_magnitude = 1
         my_quaternion = Quaternion((np.random.random(4) - 0.5) * 2 * components_magnitude)
         self.assertEqual(qf.exp(qf.log(my_quaternion)), my_quaternion)
         self.assertEqual(qf.log(qf.exp(my_quaternion)), my_quaternion)
