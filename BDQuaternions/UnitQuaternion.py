@@ -2,9 +2,9 @@ from __future__ import division, print_function
 import numbers
 import numpy as np
 
-from Quaternions._quaternion_operations import check_quadruple, mul
+from BDQuaternions._quaternion_operations import check_quadruple, mul
 
-from Quaternions import Quaternion
+from BDQuaternions import Quaternion
 
 
 class UnitQuaternion(Quaternion):

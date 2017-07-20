@@ -6,7 +6,7 @@ import re
 
 
 here = path.abspath(path.dirname(__file__))
-package_name = 'Quaternions'
+package_name = 'BDQuaternions'
 version_file = path.join(here, package_name, '_version.py')
 with open(version_file, 'rt') as f:
     version_file_line = f.read()
@@ -28,7 +28,7 @@ setup(
     description='Package for manipulations with Quaternions',
     long_description=long_description,
 
-    url='https://github.com/bond-anton/Quaternions',
+    url='https://github.com/bond-anton/BDQuaternions',
 
     author='Anton Bondarenko',
     author_email='bond.anton@gmail.com',

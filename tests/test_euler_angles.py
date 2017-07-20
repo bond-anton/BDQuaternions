@@ -2,8 +2,8 @@ from __future__ import division
 import unittest
 import numpy as np
 
-from Quaternions import _euler_angles as ea, _quaternion_operations as qo
-from Quaternions._euler_angles_conventions import default_convention, derived_conventions
+from BDQuaternions import _euler_angles as ea, _quaternion_operations as qo
+from BDQuaternions._euler_angles_conventions import default_convention, derived_conventions
 
 
 class TestEulerAngles(unittest.TestCase):

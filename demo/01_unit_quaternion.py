@@ -1,12 +1,12 @@
 from __future__ import division, print_function
 import numpy as np
 
-from Quaternions import Quaternion, UnitQuaternion
-from Quaternions import functions as qt
+from BDQuaternions import Quaternion, UnitQuaternion
+from BDQuaternions import functions as qt
 
 q1 = UnitQuaternion()
 q2 = UnitQuaternion([0, 1, 0, 0])
-print('Quaternions:', q1, q2)
+print('BDQuaternions:', q1, q2)
 print('Scalar part:', q1.scalar_part())
 print('Vector part:', q1.vector_part())
 

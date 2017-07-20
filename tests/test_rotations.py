@@ -2,7 +2,7 @@ from __future__ import division
 import unittest
 import numpy as np
 
-from Quaternions import Rotation
+from BDQuaternions import Rotation
 
 
 class TestRotation(unittest.TestCase):

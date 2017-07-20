@@ -1,6 +1,6 @@
-# Quaternions
+# BDQuaternions
 
-**Quaternions** is a python package for manipulation with quaternions objects.
+**BDQuaternions** is a python package for manipulation with quaternions objects.
 It is tested to be compatible with python 2.7 and python 3.4. The only requirement is *numpy*.
 
 Available classes are
@@ -10,7 +10,7 @@ Available classes are
 
 ## Installation
 
-In the root directory of Quaternions distribution run
+In the root directory of BDQuaternions distribution run
 ```shell
 python setup.py install
 ```
@@ -21,4 +21,4 @@ Please see the demo directory for the usage examples.
 
 ## License
 
-Quaternions is free open source software licensed under Apache license version 2.0
+BDQuaternions is free open source software licensed under Apache license version 2.0

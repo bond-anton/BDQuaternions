@@ -1,8 +1,8 @@
 from __future__ import division, print_function
 import numpy as np
 
-from Quaternions import Quaternion
-from Quaternions import functions as qf
+from BDQuaternions import Quaternion
+from BDQuaternions import functions as qf
 
 q1 = Quaternion(np.array([[[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1]],
                           [[1, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1]],

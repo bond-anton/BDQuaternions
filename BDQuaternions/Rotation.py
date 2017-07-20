@@ -1,12 +1,12 @@
 from __future__ import division, print_function
 import numpy as np
 
-from Quaternions._quaternion_operations import check_quadruple, mul, norm,\
+from BDQuaternions._quaternion_operations import check_quadruple, mul, norm,\
     quaternion_to_rotation_matrix, quaternion_from_rotation_matrix
-from Quaternions._euler_angles import check_euler_angles_convention,\
+from BDQuaternions._euler_angles import check_euler_angles_convention,\
     euler_angles_from_quaternion, euler_angles_to_quaternion
 
-from Quaternions import UnitQuaternion
+from BDQuaternions import UnitQuaternion
 
 
 class Rotation(UnitQuaternion):

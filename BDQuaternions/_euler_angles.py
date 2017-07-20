@@ -1,8 +1,8 @@
 from __future__ import division, print_function
 import numpy as np
 
-from Quaternions._quaternion_operations import quaternion_to_rotation_matrix
-from Quaternions._euler_angles_conventions import general_conventions, special_conventions, derived_conventions,\
+from BDQuaternions._quaternion_operations import quaternion_to_rotation_matrix
+from BDQuaternions._euler_angles_conventions import general_conventions, special_conventions, derived_conventions,\
     default_convention, euler_angles_codes, euler_next_axis
 
 """

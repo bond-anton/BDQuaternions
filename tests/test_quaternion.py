@@ -2,8 +2,8 @@ from __future__ import division
 import unittest
 import numpy as np
 
-from Quaternions import Quaternion
-from Quaternions import functions as qf
+from BDQuaternions import Quaternion
+from BDQuaternions import functions as qf
 
 
 class TestQuaternion(unittest.TestCase):

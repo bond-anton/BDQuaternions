@@ -2,7 +2,7 @@ from __future__ import division
 import unittest
 import numpy as np
 
-from Quaternions import _quaternion_operations as qo
+from BDQuaternions import _quaternion_operations as qo
 
 
 class TestQuaternionOperations(unittest.TestCase):

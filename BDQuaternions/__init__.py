@@ -1,0 +1,5 @@
+from BDQuaternions._version import __version__
+from BDQuaternions.Quaternion import Quaternion
+from BDQuaternions.UnitQuaternion import UnitQuaternion
+from BDQuaternions.Rotation import Rotation
+from BDQuaternions._euler_angles_conventions import list_euler_angles_conventions

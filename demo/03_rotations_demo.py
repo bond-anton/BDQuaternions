@@ -1,6 +1,6 @@
 from __future__ import division, print_function
 import numpy as np
-from Quaternions import Rotation, list_euler_angles_conventions
+from BDQuaternions import Rotation, list_euler_angles_conventions
 
 rotation = Rotation()
 rotation.euler_angles_convention = 'Bunge'

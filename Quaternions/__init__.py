@@ -1,5 +1,0 @@
-from Quaternions._version import __version__
-from Quaternions.Quaternion import Quaternion
-from Quaternions.UnitQuaternion import UnitQuaternion
-from Quaternions.Rotation import Rotation
-from Quaternions._euler_angles_conventions import list_euler_angles_conventions

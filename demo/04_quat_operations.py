@@ -1,8 +1,8 @@
 from __future__ import division, print_function
 import numpy as np
 
-from Quaternions import Rotation
-from Quaternions import _quaternion_operations as qo
+from BDQuaternions import Rotation
+from BDQuaternions import _quaternion_operations as qo
 
 
 count = 0

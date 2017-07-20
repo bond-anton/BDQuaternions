@@ -2,7 +2,7 @@ from __future__ import division, print_function
 import numpy as np
 import numbers
 
-from Quaternions._quaternion_operations import check_quadruple, mul, norm, real_matrix, complex_matrix
+from BDQuaternions._quaternion_operations import check_quadruple, mul, norm, real_matrix, complex_matrix
 
 
 class Quaternion(object):
@@ -200,7 +200,7 @@ class Quaternion(object):
             result.polar = (q_norm ** power, n_hat, theta * power)
             return result
         else:
-            raise ValueError('Quaternions can be raised only into real-value power')
+            raise ValueError('BDQuaternions can be raised only into real-value power')
 
     def real_matrix(self):
         """
