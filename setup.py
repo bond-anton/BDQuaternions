@@ -53,4 +53,5 @@ setup(
     packages=find_packages(exclude=['demo', 'tests', 'docs', 'contrib']),
     install_requires=['numpy'],
     test_suite='nose.collector',
+    tests_require=['nose']
 )
