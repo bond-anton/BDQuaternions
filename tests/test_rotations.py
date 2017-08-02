@@ -84,5 +84,7 @@ class TestRotation(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.q1.rotate([0, 1])
         with self.assertRaises(ValueError):
+            self.q1.rotate([[0, 1], [0, 1], [0, 1], [0, 1]])
+        with self.assertRaises(ValueError):
             self.q1.rotate('x')
         result = self.q1.rotate([[0, 1], [1, 0], [1, 1]])
