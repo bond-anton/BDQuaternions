@@ -14,6 +14,35 @@ class TestRotation(unittest.TestCase):
         np.testing.assert_allclose(self.q1.quadruple, np.array([1, 0, 0, 0]))
         self.assertRaises(ValueError, Rotation, np.array([0, 0, 0]))
         self.assertRaises(ValueError, Rotation, 'xxx')
+        q2 = Rotation()
+        self.assertEqual(self.q1, q2)
+        with self.assertRaises(ValueError):
+            self.assertEqual(self.q1, 1)
+
+    def test_str(self):
+        print(str(self.q1))
+        self.assertTrue(str(self.q1))
+
+    def test_euler_angles(self):
+        np.testing.assert_allclose(self.q1.euler_angles, np.zeros(3))
+
+    def test_forbidden_math(self):
+        with self.assertRaises(TypeError):
+            self.q1.__add__(3)
+        with self.assertRaises(TypeError):
+            self.q1.__radd__(3)
+        with self.assertRaises(TypeError):
+            self.q1.__sub__(3)
+        with self.assertRaises(TypeError):
+            self.q1.__rsub__(3)
+
+    def test_mul(self):
+        self.assertEqual(self.q1.__rmul__(self.q1), self.q1)
+        self.assertEqual(self.q1.__mul__(self.q1), self.q1)
+        with self.assertRaises(ValueError):
+            _ = self.q1.__rmul__('x')
+        with self.assertRaises(ValueError):
+            _ = self.q1.__mul__('x')
 
     def test_axis_angle(self):
         axis, angle = self.q1.axis_angle
@@ -52,3 +81,8 @@ class TestRotation(unittest.TestCase):
         self.q1.euler_angles_convention = 'Bunge'
         self.q1.euler_angles = [np.pi/2, 0, 0]
         np.testing.assert_allclose(self.q1.rotate([1, 0, 0]), [0, 1, 0], atol=np.finfo(float).eps * 4)
+        with self.assertRaises(ValueError):
+            self.q1.rotate([0, 1])
+        with self.assertRaises(ValueError):
+            self.q1.rotate('x')
+        result = self.q1.rotate([[0, 1], [1, 0], [1, 1]])
