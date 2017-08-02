@@ -1,4 +1,5 @@
 from __future__ import division, print_function
+import warnings
 import numpy as np
 
 
@@ -94,9 +95,6 @@ def quaternion_from_rotation_matrix(matrix):
         raise ValueError('Not a rotation matrix. det M = %2.2g' % det_m)
     inv_m = np.linalg.inv(m)
     if np.allclose(det_m, [1.0]) and np.allclose(m.T, inv_m):
-        m = np.array(m, dtype=np.float)
-        if m.shape != (3, 3):
-            raise ValueError('3x3 rotation matrix expected, got' + str(m))
         t = np.trace(m)
         if t > 3 * np.finfo(float).eps:
             r = np.sqrt(1 + t)
@@ -128,7 +126,7 @@ def quaternion_from_rotation_matrix(matrix):
             z = 0.5 * r
         quadruple = np.array([w, x, y, z])
     else:
-        print('Not a rotation matrix. det M = %2.2g' % det_m)
+        warnings.warn('Not a rotation matrix. det M = %2.2g' % det_m)
         k_m = np.array([[m[0, 0] - m[1, 1] - m[2, 2], m[0, 1] + m[1, 0], m[0, 2] + m[2, 0], m[2, 1] - m[1, 2]],
                         [m[0, 1] + m[1, 0], m[1, 1] - m[0, 0] - m[2, 2], m[1, 2] + m[2, 1], m[0, 2] - m[2, 0]],
                         [m[0, 2] + m[2, 0], m[1, 2] + m[2, 1], m[2, 2] - m[0, 0] - m[1, 1], m[1, 0] - m[0, 1]],
@@ -151,7 +149,7 @@ def exp(quadruple):
     if not np.allclose(v_norm, [0.0]):
         return np.hstack((np.exp(a) * np.cos(v_norm), np.exp(a) * v / v_norm * np.sin(v_norm)))
     else:
-        np.hstack((np.exp(a), np.zeros(3)))
+        return np.hstack((np.exp(a), np.zeros(3)))
 
 
 def log(quadruple):

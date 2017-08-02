@@ -16,6 +16,10 @@ class TestQuaternion(unittest.TestCase):
         np.testing.assert_allclose(self.q1.quadruple, np.array([0, 0, 0, 1]))
         self.assertRaises(ValueError, Quaternion, np.array([0, 0, 0]))
         self.assertRaises(ValueError, Quaternion, 'xxx')
+        self.assertEqual(str(self.q2), str(self.q2.quadruple))
+        self.assertNotEqual(self.q1, self.q2)
+        with self.assertRaises(ValueError):
+            _ = self.q1 == 'a'
 
     def test_scalar_vector_part(self):
         np.testing.assert_allclose(self.q1.scalar_part(), self.q1.quadruple[0])
@@ -32,11 +36,25 @@ class TestQuaternion(unittest.TestCase):
         np.testing.assert_allclose((self.q1 * self.q2).quadruple, quadruple)
         np.testing.assert_allclose((self.q1 * 3).quadruple, self.q1.quadruple * 3)
         np.testing.assert_allclose((3 * self.q1).quadruple, self.q1.quadruple * 3)
+        with self.assertRaises(ValueError):
+            _ = self.q2 * 'x'
+        with self.assertRaises(ValueError):
+            _ = 'x' * self.q2
 
     def test_addition(self):
         np.testing.assert_allclose((self.q1 + self.q2).quadruple, np.array([1, 2, 3, 5]))
         np.testing.assert_allclose((self.q1 - self.q2).quadruple, np.array([-1, -2, -3, -3]))
         np.testing.assert_allclose((self.q1 - 3).quadruple, np.array([-3, 0, 0, 1]))
+        np.testing.assert_allclose((3 - self.q1).quadruple, np.array([3, 0, 0, -1]))
+        np.testing.assert_allclose((3 + self.q1).quadruple, np.array([3, 0, 0, 1]))
+        with self.assertRaises(ValueError):
+            _ = 'x' + self.q1
+        with self.assertRaises(ValueError):
+            _ = self.q1 + 'x'
+        with self.assertRaises(ValueError):
+            _ = 'x' - self.q1
+        with self.assertRaises(ValueError):
+            _ = self.q1 - 'x'
 
     def test_conjugation(self):
         np.testing.assert_allclose(self.q2.conjugate().quadruple, np.array([1, -2, -3, -4]))
@@ -54,6 +72,8 @@ class TestQuaternion(unittest.TestCase):
         self.assertEqual(self.q2.distance(self.q1), (self.q1 - self.q2).norm())
         self.assertEqual(self.q1.distance(self.q2), self.q2.distance(self.q1))
         self.assertEqual(self.q1.distance(self.q1), 0)
+        with self.assertRaises(ValueError):
+            self.q1.distance('x')
 
     def test_versor(self):
         np.testing.assert_allclose(self.q1.versor().norm(), 1)
@@ -68,6 +88,8 @@ class TestQuaternion(unittest.TestCase):
     def test_division(self):
         self.assertRaises(ValueError, self.q1.__div__, self.q2)
         self.assertRaises(ValueError, self.q1.__rdiv__, self.q2)
+        self.assertRaises(ValueError, self.q1.__div__, 'x')
+        self.assertRaises(ValueError, self.q1.__rdiv__, 'x')
         self.assertEqual(self.q1 / 3, 1 / 3 * self.q1)
         self.assertEqual(3 / self.q1, 3 * self.q1.reciprocal())
 
@@ -76,3 +98,21 @@ class TestQuaternion(unittest.TestCase):
         my_quaternion = Quaternion((np.random.random(4) - 0.5) * 2 * components_magnitude)
         self.assertEqual(qf.exp(qf.log(my_quaternion)), my_quaternion)
         self.assertEqual(qf.log(qf.exp(my_quaternion)), my_quaternion)
+
+    def test_get_polar(self):
+        q = Quaternion(np.zeros(4))
+        n, n_hat, theta = q.polar
+        self.assertEqual(n, 0)
+        np.testing.assert_allclose(n_hat, np.zeros(3))
+        self.assertEqual(theta, 0)
+
+    def test_pow(self):
+        np.testing.assert_allclose((self.q1 ** 2).quadruple, np.array([-1., 0., 0., 0.]), atol=1e-12)
+        with self.assertRaises(ValueError):
+            _ = self.q1 ** self.q2
+
+    def test_to_matrix(self):
+        rm = self.q1.real_matrix()
+        cm = self.q1.complex_matrix()
+        self.assertEqual(rm.shape, (4, 4))
+        self.assertEqual(cm.shape, (2, 2))

@@ -1,8 +1,10 @@
 from __future__ import division
-import unittest
+import warnings
 import numpy as np
 
 from BDQuaternions import _quaternion_operations as qo
+
+import unittest
 
 
 class TestQuaternionOperations(unittest.TestCase):
@@ -47,6 +49,21 @@ class TestQuaternionOperations(unittest.TestCase):
             q_m_n = qo.quaternion_from_rotation_matrix(r_m_n)
             self.assertTrue(np.allclose(q_m, q_n) or np.allclose(q_m, -q_n))
             self.assertTrue(np.allclose(q_m_n, q_n) or np.allclose(q_m_n, -q_n))
+        m = np.eye(4, 4) + 1
+        with self.assertRaises(ValueError):
+            qo.quaternion_from_rotation_matrix(m)
+        m = np.random.randn(3, 3)
+        d = np.linalg.det(m)
+        if d < 0:
+            m[:, 1] = -m[:, 1]
+            d = -d
+        m = (d**(-1 / 3)) * m
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            qo.quaternion_from_rotation_matrix(m)
+            self.assertTrue(len(w) == 1)
+            self.assertTrue(issubclass(w[-1].category, UserWarning))
+            self.assertTrue('Not a rotation matrix' in str(w[-1].message))
 
     def test_log_and_exp(self):
         magnitude = 2
@@ -55,3 +72,7 @@ class TestQuaternionOperations(unittest.TestCase):
         log_q = qo.log(q)
         np.testing.assert_allclose(qo.log(exp_q), q)
         np.testing.assert_allclose(qo.exp(log_q), q)
+        q = np.hstack(([1], np.zeros(3)))
+        np.testing.assert_allclose(qo.exp(q), np.array([np.exp(1), 0, 0, 0]))
+        with self.assertRaises(ValueError):
+            qo.log(np.zeros(4))
