@@ -32,8 +32,11 @@ class TestQuaternion(unittest.TestCase):
         v2 = self.q2.vector_part()
         r3 = r1 * r2 - np.dot(v1, v2)
         v3 = r1 * v2 + r2 * v1 + np.cross(v1, v2)
+        v4 = r1 * v2 + r2 * v1 + np.cross(v2, v1)
         quadruple = np.array(np.hstack((r3, v3)))
         np.testing.assert_allclose((self.q1 * self.q2).quadruple, quadruple)
+        quadruple = np.array(np.hstack((r3, v4)))
+        np.testing.assert_allclose((self.q1.__rmul__(self.q2)).quadruple, quadruple)
         np.testing.assert_allclose((self.q1 * 3).quadruple, self.q1.quadruple * 3)
         np.testing.assert_allclose((3 * self.q1).quadruple, self.q1.quadruple * 3)
         with self.assertRaises(ValueError):
@@ -43,10 +46,13 @@ class TestQuaternion(unittest.TestCase):
 
     def test_addition(self):
         np.testing.assert_allclose((self.q1 + self.q2).quadruple, np.array([1, 2, 3, 5]))
+        np.testing.assert_allclose((self.q1.__radd__(self.q2)).quadruple, np.array([1, 2, 3, 5]))
         np.testing.assert_allclose((self.q1 - self.q2).quadruple, np.array([-1, -2, -3, -3]))
+        np.testing.assert_allclose((self.q1.__rsub__(self.q2)).quadruple, np.array([1, 2, 3, 3]))
         np.testing.assert_allclose((self.q1 - 3).quadruple, np.array([-3, 0, 0, 1]))
         np.testing.assert_allclose((3 - self.q1).quadruple, np.array([3, 0, 0, -1]))
         np.testing.assert_allclose((3 + self.q1).quadruple, np.array([3, 0, 0, 1]))
+        np.testing.assert_allclose((self.q1 + 3).quadruple, np.array([3, 0, 0, 1]))
         with self.assertRaises(ValueError):
             _ = 'x' + self.q1
         with self.assertRaises(ValueError):
