@@ -16,14 +16,14 @@ class Rotation(UnitQuaternion):
     """
 
     def __init__(self, quadruple=None, euler_angles_convention=None):
-        self._euler_angles_convention = None
-        self._euler_angles = None
+        self.__euler_angles_convention = None
+        self.__euler_angles = None
         if quadruple is None:
             quadruple = [1, 0, 0, 0]
         quadruple = check_quadruple(quadruple)
         assert np.allclose(norm(quadruple), [1.0])
         super(Rotation, self).__init__(quadruple)
-        self._set_euler_angles_convention(euler_angles_convention)
+        self.euler_angles_convention = euler_angles_convention
 
     def __eq__(self, other):
         if isinstance(other, Rotation):
@@ -46,35 +46,37 @@ class Rotation(UnitQuaternion):
         """
         return self.conjugate()
 
-    def _get_rotation_matrix(self):
-        return quaternion_to_rotation_matrix(self.quadruple)
-
-    def _set_rotation_matrix(self, m):
-        self.quadruple = quaternion_from_rotation_matrix(m)
-
     """
     roation matrix representation of Rotation quaternion
     rotation_matrix is a get/set property
     """
-    rotation_matrix = property(_get_rotation_matrix, _set_rotation_matrix)
 
-    def _get_axis_angle(self):
+    @property
+    def rotation_matrix(self):
+        return quaternion_to_rotation_matrix(self.quadruple)
+
+    @rotation_matrix.setter
+    def rotation_matrix(self, m):
+        self.quadruple = quaternion_from_rotation_matrix(m)
+
+    """
+    axis and angle representation of Rotation quaternion
+    axis_angle is a get/set property
+    """
+
+    @property
+    def axis_angle(self):
         _, axis, theta = self.polar
         return axis, theta * 2
 
-    def _set_axis_angle(self, axis_angle_components):
+    @axis_angle.setter
+    def axis_angle(self, axis_angle_components):
         axis, theta = axis_angle_components
         axis = np.array(axis, dtype=np.float)
         axis_norm = np.sqrt(np.sum(axis * axis))
         if axis_norm > 0:
             axis /= axis_norm
         self.polar = 1, axis, theta / 2
-
-    """
-    axis and angle representation of Rotation quaternion
-    axis_angle is a get/set property
-    """
-    axis_angle = property(_get_axis_angle, _set_axis_angle)
 
     def __str__(self):
         information = 'Rotation quaternion: ' + str(self.quadruple) + '\n'
@@ -86,30 +88,32 @@ class Rotation(UnitQuaternion):
         information += str(self.axis_angle) + '\n'
         return information
 
-    def _set_euler_angles_convention(self, euler_angles_convention):
-        self._euler_angles_convention = check_euler_angles_convention(euler_angles_convention)
+    """
+        euler angles convention get/set property
+    """
 
-    def _get_euler_angles_convention(self):
-        return self._euler_angles_convention
+    @property
+    def euler_angles_convention(self):
+        return self.__euler_angles_convention
+
+    @euler_angles_convention.setter
+    def euler_angles_convention(self, euler_angles_convention):
+        self.__euler_angles_convention = check_euler_angles_convention(euler_angles_convention)
 
     """
-    euler angles convention get/set property
+        Euler angles representation of Rotation quaternion
+        euler_angles is a get/set property
     """
-    euler_angles_convention = property(_get_euler_angles_convention, _set_euler_angles_convention)
 
-    def _get_euler_angles(self):
+    @property
+    def euler_angles(self):
         return euler_angles_from_quaternion(self.quadruple, self.euler_angles_convention)
 
-    def _set_euler_angles(self, euler_angles_components):
+    @euler_angles.setter
+    def euler_angles(self, euler_angles_components):
         ai, aj, ak = euler_angles_components
         quadruple = euler_angles_to_quaternion(ai, aj, ak, self.euler_angles_convention)
         self.quadruple = quadruple
-
-    """
-    Euler angles representation of Rotation quaternion
-    euler_angles is a get/set property
-    """
-    euler_angles = property(_get_euler_angles, _set_euler_angles)
 
     def __add__(self, other):
         raise TypeError('Wrong operation for rotations \'+\'.')

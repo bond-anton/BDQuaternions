@@ -2,7 +2,7 @@ from __future__ import division, print_function
 import numpy as np
 import numbers
 
-from BDQuaternions._quaternion_operations import check_quadruple, mul, norm, real_matrix, complex_matrix
+from ._quaternion_operations import check_quadruple, mul, norm, real_matrix, complex_matrix
 
 
 class Quaternion(object):
@@ -11,11 +11,11 @@ class Quaternion(object):
     """
 
     def __init__(self, quadruple=np.array([0, 0, 0, 1])):
-        self._quadruple = None
-        self._set_quadruple(quadruple)
+        self.__quadruple = None
+        self.quadruple = quadruple
 
     def __str__(self):
-        return str(self._quadruple)
+        return str(self.__quadruple)
 
     def __eq__(self, other):
         if isinstance(other, Quaternion):
@@ -23,30 +23,27 @@ class Quaternion(object):
         else:
             raise ValueError('Only another quaternion can be compared to given quaternion')
 
-    def _set_quadruple(self, quadruple):
-        self._quadruple = check_quadruple(quadruple)
+    @property
+    def quadruple(self):
+        return self.__quadruple
 
-    def _get_quadruple(self):
-        return self._quadruple
-
-    """
-    Property to get/set quaternion' quadruple
-    """
-    quadruple = property(_get_quadruple, _set_quadruple)
+    @quadruple.setter
+    def quadruple(self, quadruple):
+        self.__quadruple = check_quadruple(quadruple)
 
     def scalar_part(self):
         """
         Calculates scalar part of the Quaternion
         :return: scalar part of the Quaternion
         """
-        return self._quadruple[0]
+        return self.__quadruple[0]
 
     def vector_part(self):
         """
         Calculates vector part of the Quaternion
         :return: vector part of the Quaternion
         """
-        return self._quadruple[1:]
+        return self.__quadruple[1:]
 
     def conjugate(self):
         """
@@ -60,7 +57,7 @@ class Quaternion(object):
         if isinstance(other, Quaternion):
             return Quaternion(mul(self.quadruple, other.quadruple))
         elif isinstance(other, numbers.Number):
-            return Quaternion(mul(self.quadruple, [float(other), 0, 0, 0]))
+            return Quaternion(mul(self.quadruple, [np.float64(other), 0, 0, 0]))
         else:
             raise ValueError('Quaternion can be multiplied only by another quaternion')
 
@@ -68,7 +65,7 @@ class Quaternion(object):
         if isinstance(other, Quaternion):
             return other * self
         elif isinstance(other, numbers.Number):
-            return Quaternion(mul([float(other), 0, 0, 0], self.quadruple))
+            return Quaternion(mul([np.float64(other), 0, 0, 0], self.quadruple))
         else:
             raise ValueError('Quaternion can be multiplied only by another quaternion or number')
 
@@ -76,7 +73,7 @@ class Quaternion(object):
         if isinstance(other, Quaternion):
             return Quaternion(self.quadruple + other.quadruple)
         elif isinstance(other, numbers.Number):
-            return Quaternion(self.quadruple + np.array([float(other), 0, 0, 0]))
+            return Quaternion(self.quadruple + np.array([np.float64(other), 0, 0, 0]))
         else:
             raise ValueError('Only another quaternion or number can be added to quaternion')
 
@@ -84,7 +81,7 @@ class Quaternion(object):
         if isinstance(other, Quaternion):
             return other + self
         elif isinstance(other, numbers.Number):
-            return Quaternion(np.array([float(other), 0, 0, 0]) + self.quadruple)
+            return Quaternion(np.array([np.float64(other), 0, 0, 0]) + self.quadruple)
         else:
             raise ValueError('Only another quaternion or number can be added to quaternion')
 
@@ -92,7 +89,7 @@ class Quaternion(object):
         if isinstance(other, Quaternion):
             return self + (-1 * other)
         elif isinstance(other, numbers.Number):
-            return Quaternion(self.quadruple - np.array([float(other), 0, 0, 0]))
+            return Quaternion(self.quadruple - np.array([np.float64(other), 0, 0, 0]))
         else:
             raise ValueError('Only another quaternion or number be subtracted from quaternion')
 
@@ -100,7 +97,7 @@ class Quaternion(object):
         if isinstance(other, Quaternion):
             return other - self
         elif isinstance(other, numbers.Number):
-            return Quaternion(np.array([float(other), 0, 0, 0]) - self.quadruple)
+            return Quaternion(np.array([np.float64(other), 0, 0, 0]) - self.quadruple)
         else:
             raise ValueError('Only another quaternion or number be subtracted from quaternion')
 
@@ -146,7 +143,7 @@ class Quaternion(object):
             raise ValueError('The notation p/q is ambiguous for two quaternions p and q. \
              Please use explicit form p * q.reciprocal or q.reciprocal * p')
         elif isinstance(other, numbers.Number):
-            return self * (1 / float(other))
+            return self * (1.0 / np.float64(other))
         else:
             raise ValueError('Quaternion can be divided only by number')
 
@@ -155,7 +152,7 @@ class Quaternion(object):
             raise ValueError('The notation p/q is ambiguous for two quaternions p and q. \
              Please use explicit form p * q.reciprocal or q.reciprocal * p')
         elif isinstance(other, numbers.Number):
-            return self.reciprocal() * float(other)
+            return self.reciprocal() * np.float64(other)
         else:
             raise ValueError('Quaternion can be divided only by number')
 
@@ -165,7 +162,11 @@ class Quaternion(object):
     def __rtruediv__(self, other):
         return self.__rdiv__(other)
 
-    def _get_polar(self):
+    """
+        Property to get/set quaternion using polar notation
+    """
+    @property
+    def polar(self):
         if not np.allclose(self.norm(), [0.0]):
             a = self.scalar_part()
             v = self.vector_part()
@@ -179,19 +180,15 @@ class Quaternion(object):
         else:
             return 0, np.zeros(3), 0
 
-    def _set_polar(self, polar_components):
+    @polar.setter
+    def polar(self, polar_components):
         q_norm, n_hat, theta = polar_components
         n_hat = np.array(n_hat, dtype=np.float)
         assert q_norm >= 0
         assert np.allclose(np.sqrt(np.sum(n_hat * n_hat)), [1.0])
         a = q_norm * np.cos(theta)
         v = n_hat * q_norm * np.sin(theta)
-        self._set_quadruple(np.hstack((a, v)))
-
-    """
-    Property to get/set quaternion using polar notation
-    """
-    polar = property(_get_polar, _set_polar)
+        self.quadruple = np.hstack((a, v))
 
     def __pow__(self, power):
         if isinstance(power, numbers.Number):
