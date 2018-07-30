@@ -3,8 +3,8 @@ import numpy as np
 
 from BDQuaternions._quaternion_operations import check_quadruple, mul, norm,\
     quaternion_to_rotation_matrix, quaternion_from_rotation_matrix
-from BDQuaternions._euler_angles import check_euler_angles_convention,\
-    euler_angles_from_quaternion, euler_angles_to_quaternion
+# from BDQuaternions._euler_angles import check_euler_angles_convention,\
+#     euler_angles_from_quaternion, euler_angles_to_quaternion
 
 from BDQuaternions import UnitQuaternion
 
