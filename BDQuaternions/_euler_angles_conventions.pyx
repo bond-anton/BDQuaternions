@@ -349,6 +349,7 @@ cdef class Convention(object):
 
     def __init__(self, str label, str axes, list axes_labels, list angle_labels, list code, str description='',
                  str parent='', Function to_parent=Function(), Function from_parent=Function()):
+        self.__euler_safe_axis = (0, 1, 2, 0)
         self.__euler_next_axis = (1, 2, 0, 1)
         self.__label = label
         self.__axes = axes

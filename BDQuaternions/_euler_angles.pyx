@@ -15,7 +15,8 @@ All angles are in radians by default
 cdef class EulerAngles(object):
 
     def __init__(self, double[:] euler_angles, Convention convention):
-        self.__euler_angles = self.__reduce_euler_angles(euler_angles)
+        # self.__euler_angles = self.__reduce_euler_angles(euler_angles)
+        self.__euler_angles = euler_angles
         self.__convention = convention
 
     cdef double __reduce_angle(self, double angle, bint center=True, bint half=False):
@@ -91,7 +92,7 @@ cdef class EulerAngles(object):
             Convention parent_convention = self.__convention
             int inner_axis, parity, repetition, frame
             int i, j, k
-            double ci, si, cj, sj, ck, sk
+            double ci, si, cj, sj, ck, sk, cc, ss, cs, sc
             double[:, :] m = np.empty((3,3), dtype=np.double)
         euler_angles[0] = self.__euler_angles[0]
         euler_angles[1] = self.__euler_angles[1]
@@ -102,15 +103,13 @@ cdef class EulerAngles(object):
             euler_angles = self.__reduce_euler_angles(parent_convention.to_parent(euler_angles))
             print(np.asarray(euler_angles))
             parent_convention = parent_convention.__parent
+        print('INIT:', np.asarray(euler_angles))
         # the tuples in convention['code'] coding the inner axis (X - 0, Y - 1, Z - 2), parity (Even - 0, Odd - 1),
         # repetition (No - 0, Yes - 1), frame (0 - static; 1 - rotating frame)
         inner_axis, parity, repetition, frame = parent_convention.__code
-        print('CODE:', parent_convention.__code)
-        i = inner_axis
+        i = parent_convention.__euler_safe_axis[inner_axis]
         j = parent_convention.__euler_next_axis[i + parity]
         k = parent_convention.__euler_next_axis[i - parity + 1]
-        print('i, j, k:', i, j, k)
-        print('NEXT AXIS:', parent_convention.__euler_next_axis)
         if frame:
             euler_angles[0], euler_angles[2] = euler_angles[2], euler_angles[0]
             print(np.asarray(euler_angles))
@@ -123,24 +122,28 @@ cdef class EulerAngles(object):
         sj = sin(euler_angles[1])
         ck = cos(euler_angles[2])
         sk = sin(euler_angles[2])
+        cc = ci * ck
+        ss = si * sk
+        cs = ci * sk
+        sc = si * ck
 
         if repetition:
             m[i, i] = cj
             m[i, j] = si * sj
             m[i, k] = ci * sj
             m[j, i] = sj * sk
-            m[j, j] = ci * ck - si * cj * sk
-            m[j, k] = -si * ck - ci * cj * sk
+            m[j, j] = cc - cj * ss
+            m[j, k] = -sc - cj * cs
             m[k, i] = -sj * ck
-            m[k, j] = ci * sk + si * cj * ck
-            m[k, k] = ci * cj * ck - si * sk
+            m[k, j] = cs + cj * sc
+            m[k, k] = cj * cc - ss
         else:
             m[i, i] = cj * ck
-            m[i, j] = si * sj * ck - ci * sk
-            m[i, k] = ci * sj * ck + si * sk
+            m[i, j] = sj * sc - cs
+            m[i, k] = sj * cc + ss
             m[j, i] = cj * sk
-            m[j, j] = si * sj * sk + ci * ck
-            m[j, k] = ci * sj * sk - si * ck
+            m[j, j] = sj * ss + cc
+            m[j, k] = sj * cs - sc
             m[k, i] = -sj
             m[k, j] = si * cj
             m[k, k] = ci * cj
@@ -165,19 +168,15 @@ cdef class EulerAngles(object):
         # the tuples in convention['code'] coding the inner axis (X - 0, Y - 1, Z - 2), parity (Even - 0, Odd - 1),
         # repetition (No - 0, Yes - 1), frame (0 - static; 1 - rotating frame)
         inner_axis, parity, repetition, frame = parent_convention.__code
-        print('CODE:', parent_convention.__code)
-        i = inner_axis
+        i = parent_convention.__euler_safe_axis[inner_axis]
         j = parent_convention.__euler_next_axis[i + parity]
         k = parent_convention.__euler_next_axis[i - parity + 1]
-        print('i, j, k:', i, j, k)
-        print('NEXT AXIS:', parent_convention.__euler_next_axis)
-
         if repetition:
             sy = sqrt(m[i, j] * m[i, j] + m[i, k] * m[i, k])
-            if sy > DBL_MIN * 4:
+            if sy > DBL_MIN * 16:
                 ax = atan2(m[i, j], m[i, k])
                 ay = atan2(sy, m[i, i])
-                az = atan2(m[k, i], -m[j, i])
+                az = atan2(m[j, i], -m[k, i])
                 print('here')
             else:
                 ax = atan2(-m[j, k], m[j, j])
@@ -185,7 +184,7 @@ cdef class EulerAngles(object):
                 az = 0.0
         else:
             cy = sqrt(m[i, i] * m[i, i] + m[j, i] * m[j, i])
-            if cy > DBL_MIN * 4:
+            if cy > DBL_MIN * 16:
                 ax = atan2(m[k, j], m[k, k])
                 ay = atan2(-m[k, i], cy)
                 az = atan2(m[j, i], m[i, i])
@@ -193,15 +192,14 @@ cdef class EulerAngles(object):
                 ax = atan2(-m[j, k], m[j, j])
                 ay = atan2(-m[k, i], cy)
                 az = 0.0
-        #if parity:
-        #    ax, ay, az = -ax, -ay, -az
+        if parity:
+            ax, ay, az = -ax, -ay, -az
         if frame:
-            print('and here')
             ax, az = az, ax
         euler_angles[0] = ax
         euler_angles[1] = ay
         euler_angles[2] = az
-        print(np.asarray(euler_angles))
+        print('DONE:', np.asarray(euler_angles))
         #euler_angles = self.__reduce_euler_angles(euler_angles)
         while parent_convention != convention:
             print('Parent:', parent_convention.label)

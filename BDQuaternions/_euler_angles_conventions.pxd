@@ -1,5 +1,6 @@
 cdef class Convention(object):
     cdef:
+        int[4] __euler_safe_axis
         int[4] __euler_next_axis
         str __label
         str __axes

@@ -10,6 +10,9 @@ class TestEulerAngles(unittest.TestCase):
 
     def setUp(self):
         self.conventions = Conventions()
+        self.conventions_list = ['XYZ', 'XZY', 'XYX', 'XZX',
+                                 'YZX', 'YXZ', 'YXY', 'YZY',
+                                 'ZXY', 'ZYX', 'ZXZ', 'ZYZ']
 
     def test_euler_angles(self):
         convention = self.conventions.get_convention(self.conventions.default_convention)
@@ -17,19 +20,47 @@ class TestEulerAngles(unittest.TestCase):
         ea = EulerAngles(ea_data, convention)
         np.testing.assert_allclose(ea.euler_angles, ea_data)
 
+    def test_equivalent_angles(self):
+        for frame in ['s', 'r']:
+            for axes in self.conventions_list:
+                convention_1 = self.conventions.get_convention(axes + frame)
+                print('CONV:', axes+frame)
+                ea_data = np.deg2rad([80, 110, 120])
+                ea_data2 = np.deg2rad([-100, 70., -60.])
+                ea_data3 = np.deg2rad([80, 70, 120])
+                ea1 = EulerAngles(ea_data, convention_1)
+                np.testing.assert_allclose(np.rad2deg(ea_data), np.rad2deg(ea1.euler_angles))
+                ea2 = EulerAngles(ea_data2, convention_1)
+                np.testing.assert_allclose(np.rad2deg(ea_data2), np.rad2deg(ea2.euler_angles))
+                ea3 = EulerAngles(ea_data3, convention_1)
+                np.testing.assert_allclose(np.rad2deg(ea_data3), np.rad2deg(ea3.euler_angles))
+                m = ea1.rotation_matrix()
+                m2 = ea2.rotation_matrix()
+                m3 = ea3.rotation_matrix()
+                #np.testing.assert_allclose(m, m3)
+                np.testing.assert_allclose(m, m2)
+
+
+
     def test_euler_angles_to_matrix(self):
-        convention_1 = self.conventions.get_convention('Roe')
-        ea_data = np.deg2rad([0, 0, 0])
-        ea = EulerAngles(ea_data, convention_1)
-        m = ea.rotation_matrix()
-        np.testing.assert_allclose(m, np.eye(3))
+        for frame in ['s', 'r']:
+            for axes in self.conventions_list:
+                convention_1 = self.conventions.get_convention(axes + frame)
+                print('CONV:', axes+frame)
+                ea_data = np.deg2rad([0, 0, 0])
+                ea = EulerAngles(ea_data, convention_1)
+                m = ea.rotation_matrix()
+                np.testing.assert_allclose(m, np.eye(3))
 
-        ea_data = np.deg2rad([-47, 120, 90])
-        ea = EulerAngles(ea_data, convention_1)
-        m = ea.rotation_matrix()
-        ea.from_rotation_matrix(m, convention_1)
-        np.testing.assert_allclose(np.rad2deg(ea_data), np.rad2deg(ea.euler_angles))
-
+                ea_data = np.deg2rad([80, 110, 120])
+                ea = EulerAngles(ea_data, convention_1)
+                np.testing.assert_allclose(np.rad2deg(ea_data), np.rad2deg(ea.euler_angles))
+                m = ea.rotation_matrix()
+                ea.from_rotation_matrix(m, convention_1)
+                m2 = ea.rotation_matrix()
+                np.testing.assert_allclose(m, m2)
+                # np.testing.assert_allclose(np.rad2deg(ea_data), np.rad2deg(ea.euler_angles))
+        convention_1 = self.conventions.get_convention('bunge')
         ea_data = np.deg2rad([0, 0, 90])
         ea = EulerAngles(ea_data, convention_1)
         m = ea.rotation_matrix()
