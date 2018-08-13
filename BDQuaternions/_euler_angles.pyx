@@ -15,8 +15,7 @@ All angles are in radians by default
 cdef class EulerAngles(object):
 
     def __init__(self, double[:] euler_angles, Convention convention):
-        # self.__euler_angles = self.__reduce_euler_angles(euler_angles)
-        self.__euler_angles = euler_angles
+        self.__euler_angles = self.__reduce_euler_angles(euler_angles)
         self.__convention = convention
 
     cdef double __reduce_angle(self, double angle, bint center=True, bint half=False):
@@ -48,7 +47,7 @@ cdef class EulerAngles(object):
     cdef double[:] __reduce_euler_angles(self, double[:] euler_angles):
         cdef reduced_angles = np.empty(3, dtype=np.double)
         reduced_angles[0] = self.__reduce_angle(euler_angles[0], center=True, half=False)
-        reduced_angles[1] = self.__reduce_angle(euler_angles[1], center=True, half=True)
+        reduced_angles[1] = self.__reduce_angle(euler_angles[1], center=True, half=False)
         reduced_angles[2] = self.__reduce_angle(euler_angles[2], center=True, half=False)
         return reduced_angles
 
@@ -98,24 +97,16 @@ cdef class EulerAngles(object):
         euler_angles[1] = self.__euler_angles[1]
         euler_angles[2] = self.__euler_angles[2]
         while parent_convention.__parent != parent_convention:
-            print('Converting', parent_convention.label, '->', parent_convention.__parent.label)
-            print(np.asarray(euler_angles))
-            euler_angles = self.__reduce_euler_angles(parent_convention.to_parent(euler_angles))
-            print(np.asarray(euler_angles))
+            euler_angles = parent_convention.to_parent(euler_angles)
             parent_convention = parent_convention.__parent
-        print('INIT:', np.asarray(euler_angles))
-        # the tuples in convention['code'] coding the inner axis (X - 0, Y - 1, Z - 2), parity (Even - 0, Odd - 1),
-        # repetition (No - 0, Yes - 1), frame (0 - static; 1 - rotating frame)
         inner_axis, parity, repetition, frame = parent_convention.__code
         i = parent_convention.__euler_safe_axis[inner_axis]
         j = parent_convention.__euler_next_axis[i + parity]
         k = parent_convention.__euler_next_axis[i - parity + 1]
         if frame:
             euler_angles[0], euler_angles[2] = euler_angles[2], euler_angles[0]
-            print(np.asarray(euler_angles))
         if parity:
             euler_angles[0], euler_angles[1], euler_angles[2] = -euler_angles[0], -euler_angles[1], -euler_angles[2]
-            print(np.asarray(euler_angles))
         ci = cos(euler_angles[0])
         si = sin(euler_angles[0])
         cj = cos(euler_angles[1])
@@ -165,26 +156,23 @@ cdef class EulerAngles(object):
             double ci, si, cj, sj, ck, sk, sy, cy, ax, ay, az
         while parent_convention.__parent != parent_convention:
             parent_convention = parent_convention.__parent
-        # the tuples in convention['code'] coding the inner axis (X - 0, Y - 1, Z - 2), parity (Even - 0, Odd - 1),
-        # repetition (No - 0, Yes - 1), frame (0 - static; 1 - rotating frame)
         inner_axis, parity, repetition, frame = parent_convention.__code
         i = parent_convention.__euler_safe_axis[inner_axis]
         j = parent_convention.__euler_next_axis[i + parity]
         k = parent_convention.__euler_next_axis[i - parity + 1]
         if repetition:
             sy = sqrt(m[i, j] * m[i, j] + m[i, k] * m[i, k])
-            if sy > DBL_MIN * 16:
+            if sy > DBL_MIN * 4:
                 ax = atan2(m[i, j], m[i, k])
                 ay = atan2(sy, m[i, i])
                 az = atan2(m[j, i], -m[k, i])
-                print('here')
             else:
                 ax = atan2(-m[j, k], m[j, j])
                 ay = atan2(sy, m[i, i])
                 az = 0.0
         else:
             cy = sqrt(m[i, i] * m[i, i] + m[j, i] * m[j, i])
-            if cy > DBL_MIN * 16:
+            if cy > DBL_MIN * 4:
                 ax = atan2(m[k, j], m[k, k])
                 ay = atan2(-m[k, i], cy)
                 az = atan2(m[j, i], m[i, i])
@@ -199,18 +187,10 @@ cdef class EulerAngles(object):
         euler_angles[0] = ax
         euler_angles[1] = ay
         euler_angles[2] = az
-        print('DONE:', np.asarray(euler_angles))
-        #euler_angles = self.__reduce_euler_angles(euler_angles)
         while parent_convention != convention:
-            print('Parent:', parent_convention.label)
-            print('Current:', current_convention.label)
             while current_convention.__parent != parent_convention:
                 current_convention = current_convention.__parent
-                print('-->Current:', current_convention.label)
-            print('Converting', current_convention.__parent.label, '->', current_convention.label)
-            print(np.asarray(euler_angles))
             euler_angles = current_convention.from_parent(euler_angles)
-            print(np.asarray(euler_angles))
             parent_convention = current_convention
             current_convention = convention
         self.__euler_angles = euler_angles

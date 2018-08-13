@@ -22,10 +22,11 @@ cdef class Conventions(object):
             'YXZs': (1, 1, 0, 0), 'YXYs': (1, 1, 1, 0), 'ZXYs': (2, 0, 0, 0),
             'ZXZs': (2, 0, 1, 0), 'ZYXs': (2, 1, 0, 0), 'ZYZs': (2, 1, 1, 0),
             # rotating frame
-            'ZYXr': (0, 0, 0, 1), 'XYXr': (0, 0, 1, 1), 'YZXr': (0, 1, 0, 1),
-            'XZXr': (0, 1, 1, 1), 'XZYr': (1, 0, 0, 1), 'YZYr': (1, 0, 1, 1),
-            'ZXYr': (1, 1, 0, 1), 'YXYr': (1, 1, 1, 1), 'YXZr': (2, 0, 0, 1),
-            'ZXZr': (2, 0, 1, 1), 'XYZr': (2, 1, 0, 1), 'ZYZr': (2, 1, 1, 1)}
+            'XYZr': (0, 0, 0, 1), 'XYXr': (0, 0, 1, 1), 'XZYr': (0, 1, 0, 1),
+            'XZXr': (0, 1, 1, 1), 'YZXr': (1, 0, 0, 1), 'YZYr': (1, 0, 1, 1),
+            'YXZr': (1, 1, 0, 1), 'YXYr': (1, 1, 1, 1), 'ZXYr': (2, 0, 0, 1),
+            'ZXZr': (2, 0, 1, 1), 'ZYXr': (2, 1, 0, 1), 'ZYZr': (2, 1, 1, 1)
+        }
 
         self.__default_convention = 'XYZs'
 
