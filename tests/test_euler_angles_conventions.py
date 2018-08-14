@@ -2,7 +2,7 @@ from __future__ import division
 import unittest
 import numpy as np
 
-from BDQuaternions._euler_angles_conventions import Convention, Function, Conventions
+from BDQuaternions.EulerAnglesConventions import Convention, Function, Conventions
 
 
 class TestEulerAnglesConventions(unittest.TestCase):

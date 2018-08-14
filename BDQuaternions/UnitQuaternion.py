@@ -2,7 +2,7 @@ from __future__ import division, print_function
 import numbers
 import numpy as np
 
-from BDQuaternions._quaternion_operations import check_quadruple, mul
+from BDQuaternions._quaternion_operations import mul
 
 from BDQuaternions import Quaternion
 
@@ -15,7 +15,7 @@ class UnitQuaternion(Quaternion):
     def __init__(self, quadruple=None):
         if quadruple is None:
             quadruple = [1, 0, 0, 0]
-        quadruple = check_quadruple(quadruple)
+        quadruple = quadruple
         assert np.allclose(np.sum(quadruple ** 2), 1.0)
         super(UnitQuaternion, self).__init__(quadruple)
 

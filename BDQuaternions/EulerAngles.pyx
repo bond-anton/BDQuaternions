@@ -1,10 +1,13 @@
 from __future__ import division, print_function
 import numpy as np
 
+from cython import boundscheck, wraparound
+
 from BDQuaternions._quaternion_operations import quaternion_to_rotation_matrix
+
 from libc.math cimport sin, cos, atan2, sqrt, M_PI
 from libc.float cimport DBL_MIN
-from ._euler_angles_conventions cimport Convention
+from .EulerAnglesConventions cimport Convention
 
 """
 Euler angles conversion algorithms after Ken Shoemake in Graphics Gems IV (Academic Press, 1994), p. 222
@@ -44,6 +47,8 @@ cdef class EulerAngles(object):
                 reduced_angle = -reduced_angle
         return reduced_angle
 
+    @boundscheck(False)
+    @wraparound(False)
     cdef double[:] __reduce_euler_angles(self, double[:] euler_angles):
         cdef reduced_angles = np.empty(3, dtype=np.double)
         reduced_angles[0] = self.__reduce_angle(euler_angles[0], center=True, half=False)
@@ -81,6 +86,8 @@ cdef class EulerAngles(object):
             self.__euler_angles = self.__reduce_euler_angles(self.__convention.to_parent(self.__euler_angles))
             self.__convention = self.__convention.__parent
 
+    @boundscheck(False)
+    @wraparound(False)
     cpdef double[:, :] rotation_matrix(self):
         """
         Convert Euler angles to rotation matrix
@@ -140,6 +147,8 @@ cdef class EulerAngles(object):
             m[k, k] = ci * cj
         return m
 
+    @boundscheck(False)
+    @wraparound(False)
     cpdef void from_rotation_matrix(self, double[:, :] m, Convention convention):
         """
         convert rotation matrix to Euler angles

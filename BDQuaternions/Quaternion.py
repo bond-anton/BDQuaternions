@@ -2,7 +2,7 @@ from __future__ import division, print_function
 import numpy as np
 import numbers
 
-from ._quaternion_operations import check_quadruple, mul, norm, real_matrix, complex_matrix
+from ._quaternion_operations import mul, norm, real_matrix, complex_matrix
 
 
 class Quaternion(object):
@@ -29,7 +29,7 @@ class Quaternion(object):
 
     @quadruple.setter
     def quadruple(self, quadruple):
-        self.__quadruple = check_quadruple(quadruple)
+        self.__quadruple = quadruple
 
     def scalar_part(self):
         """

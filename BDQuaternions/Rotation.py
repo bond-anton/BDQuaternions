@@ -1,7 +1,7 @@
 from __future__ import division, print_function
 import numpy as np
 
-from BDQuaternions._quaternion_operations import check_quadruple, mul, norm,\
+from BDQuaternions._quaternion_operations import mul, norm,\
     quaternion_to_rotation_matrix, quaternion_from_rotation_matrix
 # from BDQuaternions._euler_angles import check_euler_angles_convention,\
 #     euler_angles_from_quaternion, euler_angles_to_quaternion
@@ -20,7 +20,7 @@ class Rotation(UnitQuaternion):
         self.__euler_angles = None
         if quadruple is None:
             quadruple = [1, 0, 0, 0]
-        quadruple = check_quadruple(quadruple)
+        quadruple = quadruple
         assert np.allclose(norm(quadruple), [1.0])
         super(Rotation, self).__init__(quadruple)
         self.euler_angles_convention = euler_angles_convention

@@ -1,4 +1,4 @@
-from BDQuaternions._euler_angles_conventions cimport Convention
+from BDQuaternions.EulerAnglesConventions cimport Convention
 
 cdef class EulerAngles(object):
     cdef:
