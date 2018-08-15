@@ -165,11 +165,12 @@ cpdef log(double[:] q):
     """
     cdef:
         double q_norm, v_norm, a = q[0], b = q[1], c = q[2], d = q[3]
-        double[:] result = np.empty(4, dtype=np.double)
+        double[:] result = np.zeros(4, dtype=np.double)
     q_norm = norm(q)
     v_norm = sqrt(b * b + c * c + d * d)
     result[0] = np.log(q_norm)
-    result[1] = b / v_norm * acos(a / q_norm)
-    result[2] = c / v_norm * acos(a / q_norm)
-    result[3] = d / v_norm * acos(a / q_norm)
+    if v_norm > 0.0:
+        result[1] = b / v_norm * acos(a / q_norm)
+        result[2] = c / v_norm * acos(a / q_norm)
+        result[3] = d / v_norm * acos(a / q_norm)
     return result

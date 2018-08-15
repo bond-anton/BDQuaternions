@@ -36,21 +36,20 @@ class TestFunctions(unittest.TestCase):
 
     def test_log_exp_q(self):
         self.assertTrue(check_log_exp_q())
-        q = Quaternion(np.array([0, 0, 0, 0]))
-        with self.assertRaises(ValueError):
-            check_log_exp_q(q)
-        q = Quaternion(np.array([0, 0, 0, 1]))
+        q = Quaternion(np.array([0, 0, 0, 0], dtype=np.double))
         self.assertTrue(check_log_exp_q(q))
-        q = Quaternion(np.array([1, 0, 0, 0]))
+        q = Quaternion(np.array([0, 0, 0, 1], dtype=np.double))
+        self.assertTrue(check_log_exp_q(q))
+        q = Quaternion(np.array([1, 0, 0, 0], dtype=np.double))
         self.assertTrue(check_log_exp_q(q))
 
     def test_log_exp_number(self):
         self.assertTrue(check_log_exp_number())
 
     def test_arrays(self):
-        #qs = check_log_exp_q([rand_q(magnitude=2) for i in range(5)])
-        #self.assertTrue(qs)
-        ns = check_log_exp_number([np.random.random(1)[0] * 5 for i in range(5)])
+        qs = check_log_exp_q([rand_q(magnitude=2) for _ in range(5)])
+        self.assertTrue(qs)
+        ns = check_log_exp_number([np.random.random(1)[0] * 5 for _ in range(5)])
         self.assertTrue(ns)
 
     def test_raises(self):
