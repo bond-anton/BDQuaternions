@@ -2,9 +2,11 @@ from __future__ import division, print_function
 import numbers
 import numpy as np
 
-from BDQuaternions._quaternion_operations import norm
+from ._quaternion_operations import norm
 
-from BDQuaternions import Quaternion, UnitQuaternion, Rotation
+from .Quaternion import Quaternion
+from .UnitQuaternion import UnitQuaternion
+from .Rotation import Rotation
 
 
 def random_rotation():

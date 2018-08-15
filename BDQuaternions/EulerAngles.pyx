@@ -3,11 +3,11 @@ import numpy as np
 
 from cython import boundscheck, wraparound
 
-from BDQuaternions._quaternion_operations import quaternion_to_rotation_matrix
 
 from libc.math cimport sin, cos, atan2, sqrt, M_PI
 from libc.float cimport DBL_MIN
 from .EulerAnglesConventions cimport Convention
+from ._quaternion_operations cimport quaternion_to_rotation_matrix
 
 """
 Euler angles conversion algorithms after Ken Shoemake in Graphics Gems IV (Academic Press, 1994), p. 222
