@@ -1,4 +1,5 @@
 from __future__ import division
+import sys
 import unittest
 import numpy as np
 
@@ -15,7 +16,10 @@ class TestQuaternion(unittest.TestCase):
     def test_quaternion_constructor(self):
         np.testing.assert_allclose(self.q1.quadruple, np.array([0, 0, 0, 1]))
         self.assertRaises(ValueError, Quaternion, np.array([0, 0, 0]))
-        self.assertRaises(TypeError, Quaternion, 'xxx')
+        if sys.version_info > (3, 0):
+            self.assertRaises(TypeError, Quaternion, 'xxx')
+        else:
+            self.assertRaises(BufferError, Quaternion, 'xxx')
         self.assertEqual(str(self.q2), str(self.q2.quadruple))
         self.assertNotEqual(self.q1, self.q2)
         # with self.assertRaises(ValueError):
