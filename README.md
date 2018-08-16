@@ -15,7 +15,7 @@ Available classes are
 
 To install type in a shell
 ```shell
-python setup.py install
+pip install BDQuaternions
 ```
 or in the root directory of BDQuaternions distribution run
 ```shell
