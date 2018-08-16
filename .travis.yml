@@ -4,11 +4,14 @@ python:
   - "3.5"
   - "3.6"
 # command to install dependencies
-install: "pip install -r requirements.txt"
+install:
+- pip install -r requirements.txt
 # command to run tests
-script: "nosetests -v --with-coverage --cover-package=BDQuaternions"
+script:
+- python setup.py build_ext --inplace &&
+  nosetests -v --with-coverage --cover-package=BDQuaternions
 # codecov support
 before_install:
-  pip install codecov
+- pip install codecov
 after_success:
-  codecov
+- codecov

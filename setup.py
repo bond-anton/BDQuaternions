@@ -1,4 +1,5 @@
 from setuptools import setup, find_packages
+from Cython.Build import cythonize
 
 from codecs import open
 from os import path
@@ -27,6 +28,7 @@ setup(
 
     description='Package for manipulations with Quaternions',
     long_description=long_description,
+    long_description_content_type='text/markdown',
 
     url='https://github.com/bond-anton/BDQuaternions',
 
@@ -50,8 +52,10 @@ setup(
 
     keywords='Quaternion 3D rotations',
 
-    packages=find_packages(exclude=['demo', 'tests', 'docs', 'contrib']),
-    install_requires=['numpy'],
+    packages=find_packages(exclude=['demo', 'tests', 'docs', 'contrib', 'venv', 'venv_2.7']),
+    ext_modules=cythonize('BDQuaternions/*.pyx'),
+    # package_data={'BDQuaternions': ['Mesh1D.pxd', 'Mesh1DUniform.pxd', 'TreeMesh1D.pxd', 'TreeMesh1DUniform.pxd']},
+    install_requires=['numpy', 'Cython'],
     test_suite='nose.collector',
     tests_require=['nose']
 )
