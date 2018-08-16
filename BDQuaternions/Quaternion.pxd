@@ -4,6 +4,7 @@ cdef class Quaternion(object):
 
     cpdef double scalar_part(self)
     cdef __vector_part(self)
+    cdef __conjugate(self)
     cpdef Quaternion conjugate(self)
 
     cpdef norm(self)

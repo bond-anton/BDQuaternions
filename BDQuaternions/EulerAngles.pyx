@@ -7,7 +7,8 @@ from cython import boundscheck, wraparound
 from libc.math cimport sin, cos, atan2, sqrt, M_PI
 from libc.float cimport DBL_MIN
 from .EulerAnglesConventions cimport Convention
-from ._quaternion_operations cimport quaternion_to_rotation_matrix
+from ._quaternion_operations cimport quaternion_to_rotation_matrix, quaternion_from_rotation_matrix
+from .Rotation cimport Rotation
 
 """
 Euler angles conversion algorithms after Ken Shoemake in Graphics Gems IV (Academic Press, 1994), p. 222
@@ -216,60 +217,32 @@ cdef class EulerAngles(object):
         m = self.rotation_matrix()
         self.from_rotation_matrix(m, new_convention)
 
-'''
-    def euler_angles_to_quaternion(ai, aj, ak, convention):
+
+    cdef __to_quaternion(self):
         """
         Convert Euler angles to quaternion
-        :param ai: first Euler angle
-        :param aj: second Euler angle
-        :param ak: third Euler angle
-        :param convention: dict describing Euler angles convention
-        :return: Quaternion as numpy array of for floats [w*1, x*i, y*j, z*k]
+        :return: Quaternion as an array of for floats [w*1, x*i, y*j, z*k]
         """
-        ax, ay, az, parent_convention = euler_angles_in_parent_convention(ai, aj, ak, convention)
-        # the tuples in convention['code'] coding the inner axis (X - 0, Y - 1, Z - 2), parity (Even - 0, Odd - 1),
-        # repetition (No - 0, Yes - 1), frame (0 - static; 1 - rotating frame)
-        inner_axis, parity, repetition, frame = parent_convention['code']
-        i = inner_axis + 1
-        j = euler_next_axis[i + parity - 1] + 1
-        k = euler_next_axis[i - parity] + 1
-        if frame:
-            ax, az = az, ax
-        if parity:
-            ay = -ay
-        ax /= 2
-        ay /= 2
-        az /= 2
-        ci = np.cos(ax)
-        si = np.sin(ax)
-        cj = np.cos(ay)
-        sj = np.sin(ay)
-        ck = np.cos(az)
-        sk = np.sin(az)
+        cdef:
+            double[:, :] matrix
+        matrix = self.rotation_matrix()
+        return quaternion_from_rotation_matrix(matrix)
 
-        quadruple = np.zeros(4, dtype=np.float)
-        if repetition:
-            quadruple[0] = ci * cj * ck - si * cj * sk
-            quadruple[i] = ci * cj * sk + si * cj * ck
-            quadruple[j] = ci * sj * ck + si * sj * sk
-            quadruple[k] = ci * sj * sk - si * sj * ck
-        else:
-            quadruple[0] = ci * cj * ck + si * sj * sk
-            quadruple[i] = si * cj * ck - ci * sj * sk
-            quadruple[j] = si * cj * sk + ci * sj * ck
-            quadruple[k] = ci * cj * sk - si * sj * ck
-        if parity:
-            quadruple[j] *= -1.0
-        return quadruple
+    cpdef Rotation to_quaternion(self):
+        return Rotation(self.__to_quaternion(), euler_angles_convention=self.__convention)
 
 
-    def euler_angles_from_quaternion(quadruple, convention):
+    cdef void __from_quaternion(self, double[:] quadruple, Convention convention):
         """
         Convert Quaternion to Euler angles
-        :param quadruple: Quaternion as numpy array of for floats [w*1, x*i, y*j, z*k]
+        :param quadruple: Quaternion as an array of for floats [w*1, x*i, y*j, z*k]
         :param convention: dict describing Euler angles convention
-        :return: ax, ay, az three Euler angles
         """
+        cdef:
+            double[:, :] matrix
         matrix = quaternion_to_rotation_matrix(quadruple)
-        return euler_angles_from_matrix(matrix, convention)
-'''
+        self.from_rotation_matrix(matrix, convention)
+
+
+    cpdef void from_quaternion(self, Rotation quaternion, Convention convention):
+        self.__from_quaternion(quaternion.quadruple, convention)

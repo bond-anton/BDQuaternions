@@ -1,4 +1,6 @@
 from .EulerAnglesConventions cimport Convention
+from .Rotation cimport Rotation
+
 
 cdef class EulerAngles(object):
     cdef:
@@ -11,3 +13,9 @@ cdef class EulerAngles(object):
     cpdef double[:, :] rotation_matrix(self)
     cpdef void from_rotation_matrix(self, double[:, :] m, Convention convention)
     cpdef void change_convention(self, Convention new_convention)
+
+    cdef __to_quaternion(self)
+    cpdef Rotation to_quaternion(self)
+
+    cdef void __from_quaternion(self, double[:] quadruple, Convention convention)
+    cpdef void from_quaternion(self, Rotation quaternion, Convention convention)

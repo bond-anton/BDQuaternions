@@ -32,7 +32,7 @@ cdef class Quaternion(object):
                 return not np.allclose(x.quadruple, y.quadruple)
             return True
         else:
-            return False
+            return NotImplemented
 
 
     @property
@@ -63,11 +63,7 @@ cdef class Quaternion(object):
         """
         return np.asarray(self.__vector_part())
 
-    cpdef Quaternion conjugate(self):
-        """
-        Calculates conjugate for the Quaternion
-        :return: Quaternion which is conjugate of current quaternion
-        """
+    cdef __conjugate(self):
         cdef:
             double[:] quadruple = np.empty(4, dtype=np.double)
             double[:] v_part = self.__vector_part()
@@ -75,7 +71,14 @@ cdef class Quaternion(object):
         quadruple[1] = -v_part[0]
         quadruple[2] = -v_part[1]
         quadruple[3] = -v_part[2]
-        return Quaternion(quadruple)
+        return quadruple
+
+    cpdef Quaternion conjugate(self):
+        """
+        Calculates conjugate for the Quaternion
+        :return: Quaternion which is conjugate of current quaternion
+        """
+        return Quaternion(self.__conjugate())
 
     def __mul__(x, y):
         if isinstance(x, Quaternion) and isinstance(y, Quaternion):
