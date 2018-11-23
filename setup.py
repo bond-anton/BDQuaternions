@@ -1,4 +1,5 @@
 from setuptools import setup, find_packages
+import sys
 from Cython.Build import cythonize
 
 from codecs import open
@@ -53,8 +54,9 @@ setup(
     keywords='Quaternion 3D rotations',
 
     packages=find_packages(exclude=['demo', 'tests', 'docs', 'contrib', 'venv', 'venv_2.7']),
-    ext_modules=cythonize('BDQuaternions/*.pyx'),
-    # package_data={'BDQuaternions': ['Mesh1D.pxd', 'Mesh1DUniform.pxd', 'TreeMesh1D.pxd', 'TreeMesh1DUniform.pxd']},
+    ext_modules=cythonize('BDQuaternions/*.pyx',
+                          compiler_directives={'language_level': sys.version_info[0]}),
+    package_data={'BDQuaternions': ['*.pxd']},
     install_requires=['numpy', 'Cython'],
     test_suite='nose.collector',
     tests_require=['nose']
