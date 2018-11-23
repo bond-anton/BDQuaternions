@@ -2,14 +2,14 @@ from __future__ import division, print_function
 import numbers
 import numpy as np
 
-from ._quaternion_operations import norm
+from ._quaternion_operations cimport norm
 
-from .Quaternion import Quaternion
-from .UnitQuaternion import UnitQuaternion
-from .Rotation import Rotation
+from .Quaternion cimport Quaternion
+from .UnitQuaternion cimport UnitQuaternion
+from .Rotation cimport Rotation
 
 
-def random_rotation():
+cpdef Rotation random_rotation():
     """
     Calculates random rotation quaternion
     :return: random Rotation
@@ -25,7 +25,7 @@ def random_rotation():
     return Rotation(quadruple)
 
 
-def random_unit_quaternion():
+cpdef UnitQuaternion random_unit_quaternion():
     """
     Calculates random unit quaternion
     :return: random UnitQuaternion
@@ -41,7 +41,7 @@ def random_unit_quaternion():
     return UnitQuaternion(quadruple)
 
 
-def random_quaternion(quadruple_norm=None):
+cpdef Quaternion random_quaternion(double quadruple_norm=0.0):
     """
     Calculates random quaternion
     :return: random Quaternion
