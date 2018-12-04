@@ -185,7 +185,4 @@ cdef class Rotation(UnitQuaternion):
         else:
             raise ValueError('Input must be a single point or an array of points coordinates with shape Nx3')
         result = np.dot(self.rotation_matrix, xyz.T).T
-        if xyz.size == 3:
-            return result[0]
-        else:
-            return result
+        return result
