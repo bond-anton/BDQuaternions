@@ -3,8 +3,8 @@ cdef class Quaternion(object):
         double[:] __quadruple
 
     cpdef double scalar_part(self)
-    cdef __vector_part(self)
-    cdef __conjugate(self)
+    cdef double[:] __vector_part(self)
+    cdef double[:] __conjugate(self)
     cpdef Quaternion conjugate(self)
 
     cpdef norm(self)

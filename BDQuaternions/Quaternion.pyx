@@ -2,6 +2,7 @@ from __future__ import division, print_function
 import numpy as np
 import numbers
 
+from cpython.array cimport array, clone
 from cpython.object cimport Py_EQ, Py_NE
 
 from ._quaternion_operations cimport mul, norm, real_matrix, complex_matrix
@@ -53,7 +54,7 @@ cdef class Quaternion(object):
         """
         return self.__quadruple[0]
 
-    cdef __vector_part(self):
+    cdef double[:] __vector_part(self):
         return self.__quadruple[1:]
 
     def vector_part(self):
@@ -63,10 +64,11 @@ cdef class Quaternion(object):
         """
         return np.asarray(self.__vector_part())
 
-    cdef __conjugate(self):
+    cdef double[:] __conjugate(self):
         cdef:
-            double[:] quadruple = np.empty(4, dtype=np.double)
             double[:] v_part = self.__vector_part()
+            array[double] quadruple, template = array('d')
+        quadruple = clone(template, 4, zero=False)
         quadruple[0] = self.scalar_part()
         quadruple[1] = -v_part[0]
         quadruple[2] = -v_part[1]

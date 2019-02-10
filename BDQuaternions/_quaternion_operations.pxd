@@ -1,11 +1,11 @@
-cpdef mul(double[:] q1, double[:] q2)
-cpdef norm(double[:] quadruple)
+cpdef double[:] mul(double[:] q1, double[:] q2)
+cpdef double norm(double[:] quadruple)
 
-cpdef real_matrix(double[:] q)
-cpdef complex_matrix(double[:] q)
+cpdef double[:, :] real_matrix(double[:] q)
+cpdef double complex[:, :] complex_matrix(double[:] q)
 
-cpdef quaternion_to_rotation_matrix(double[:] q)
-cpdef quaternion_from_rotation_matrix(double[:, :] m)
+cpdef double[:, :] quaternion_to_rotation_matrix(double[:] q)
+cpdef double[:] quaternion_from_rotation_matrix(double[:, :] m)
 
-cpdef exp(double[:] q)
-cpdef log(double[:] q)
+cpdef double[:] exp(double[:] q)
+cpdef double[:] log(double[:] q)

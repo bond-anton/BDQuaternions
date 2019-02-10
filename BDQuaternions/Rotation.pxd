@@ -9,4 +9,4 @@ cdef class Rotation(UnitQuaternion):
     cpdef Rotation conjugate(self)
     cpdef Rotation reciprocal(self)
 
-    cpdef rotate(self, xyz)
+    cpdef double[:, :] rotate(self, double[:, :] xyz)

@@ -168,24 +168,10 @@ cdef class Rotation(UnitQuaternion):
         else:
             return NotImplemented
 
-    cpdef rotate(self, xyz):
+    cpdef double[:, :] rotate(self, double[:, :] xyz):
         """
         Apply rotation to vector or array of vectors
         :param xyz: vector or array of vectors
         :return: rotated vector or array of vectors
         """
-        xyz = np.array(xyz, dtype=np.float)
-        if len(xyz.shape) == 2:
-            if xyz.shape[1] != 3 and xyz.shape[0] == 3:
-                xyz = xyz.T
-            elif 3 not in xyz.shape:
-                raise ValueError('Input must be a single point or an array of points coordinates with shape Nx3')
-        elif len(xyz.shape) == 1 and xyz.size == 3:
-            xyz = xyz.reshape(1, 3)
-        else:
-            raise ValueError('Input must be a single point or an array of points coordinates with shape Nx3')
-        result = np.dot(self.rotation_matrix, xyz.T).T
-        if xyz.size == 3:
-            return result[0]
-        else:
-            return result
+        return np.dot(self.rotation_matrix, xyz.T).T

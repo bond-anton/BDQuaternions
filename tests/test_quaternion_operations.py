@@ -68,4 +68,5 @@ class TestQuaternionOperations(unittest.TestCase):
         np.testing.assert_allclose(qo.exp(log_q), q)
         q = np.hstack(([1], np.zeros(3)))
         np.testing.assert_allclose(qo.exp(q), np.array([np.exp(1), 0, 0, 0]))
-        print('log [0. 0. 0. 0.] =', np.asarray(qo.log(np.zeros(4))))
+        print('\nlog([0. 0. 0. 0.]) =', np.asarray(qo.log(np.zeros(4))))
+        print('\nexp(log([0. 0. 0. 0.])) =', np.asarray(qo.exp(qo.log(np.zeros(4)))))
