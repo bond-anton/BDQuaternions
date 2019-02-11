@@ -5,7 +5,7 @@ from BDQuaternions import Quaternion, UnitQuaternion
 from BDQuaternions import functions as qt
 
 q1 = UnitQuaternion()
-q2 = UnitQuaternion([0, 1, 0, 0])
+q2 = UnitQuaternion(np.array([0, 1, 0, 0], dtype=np.double))
 print('BDQuaternions:', q1, q2)
 print('Scalar part:', q1.scalar_part())
 print('Vector part:', q1.vector_part())

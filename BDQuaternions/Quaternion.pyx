@@ -2,6 +2,7 @@ from __future__ import division, print_function
 import numpy as np
 import numbers
 
+from libc.math cimport sqrt, cos, sin, acos
 from cpython.array cimport array, clone
 from cpython.object cimport Py_EQ, Py_NE
 
@@ -169,12 +170,12 @@ cdef class Quaternion(object):
         if not np.allclose(self.norm(), [0.0]):
             a = self.scalar_part()
             v = self.vector_part()
-            v_norm = np.sqrt(np.sum(v * v))
-            if not np.allclose(v_norm, [0.0]):
+            v_norm = sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2])
+            if not np.allclose(v_norm, 0.0):
                 n_hat = v / v_norm
             else:
                 n_hat = np.zeros(3)
-            theta = np.arccos(a / self.norm())
+            theta = acos(a / self.norm())
             return self.norm(), n_hat, theta
         else:
             return 0, np.zeros(3), 0
@@ -182,11 +183,10 @@ cdef class Quaternion(object):
     @polar.setter
     def polar(self, polar_components):
         q_norm, n_hat, theta = polar_components
-        n_hat = np.array(n_hat, dtype=np.float)
+        n_hat = np.array(n_hat, dtype=np.double)
         assert q_norm >= 0
-        assert np.allclose(np.sqrt(np.sum(n_hat * n_hat)), [1.0])
-        a = q_norm * np.cos(theta)
-        v = n_hat * q_norm * np.sin(theta)
+        a = q_norm * cos(theta)
+        v = n_hat * q_norm * sin(theta)
         self.__quadruple = np.hstack((a, v))
 
     def __pow__(x, power, modulo):

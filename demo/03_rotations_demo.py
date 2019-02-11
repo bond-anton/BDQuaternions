@@ -1,7 +1,8 @@
 from __future__ import division, print_function
 import numpy as np
-from BDQuaternions import Rotation, list_euler_angles_conventions
+from BDQuaternions import Rotation, Conventions
 
+conventions = Conventions()
 rotation = Rotation()
 rotation.euler_angles_convention = 'Bunge'
 print(rotation)
@@ -14,7 +15,7 @@ rotation2.euler_angles_convention = 'Bunge'
 print(rotation2, 3*np.pi/2)
 print(rotation2 == rotation)
 
-print(list_euler_angles_conventions('special'))
-print(list_euler_angles_conventions('derived'))
-print(list_euler_angles_conventions(['special', 'derived']))
-print(list_euler_angles_conventions('general'))
+print(conventions.list_euler_angles_conventions('special'))
+print(conventions.list_euler_angles_conventions('derived'))
+print(conventions.list_euler_angles_conventions(['special', 'derived']))
+print(conventions.list_euler_angles_conventions('general'))
