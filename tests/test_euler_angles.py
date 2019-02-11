@@ -76,6 +76,7 @@ class TestEulerAngles(unittest.TestCase):
                 result[1] = euler_angles[1] * 2
                 result[2] = euler_angles[2] - 0.75
                 return result
+
         for parent_conv in ['Kocks', 'Canova']:
             synthetic_convention = Convention('Synthetic 1', 'ZYZr', ['Phi', 'Theta', 'rho'], ['alpha', 'beta', 'gamma'],
                                               [2, 1, 0, 1], description='', parent=parent_conv,

@@ -57,7 +57,7 @@ setup(
     ext_modules=cythonize('BDQuaternions/*.pyx',
                           compiler_directives={'language_level': sys.version_info[0]}),
     package_data={'BDQuaternions': ['*.pxd']},
-    install_requires=['numpy', 'Cython'],
+    install_requires=['numpy', 'scipy', 'Cython'],
     test_suite='nose.collector',
     tests_require=['nose']
 )

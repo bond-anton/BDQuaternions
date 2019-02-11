@@ -4,6 +4,7 @@ import numpy as np
 
 from .Quaternion cimport Quaternion
 from ._quaternion_operations cimport exp as q_exp, log as q_log
+from libc.math cimport exp as c_exp, log as c_log
 
 
 def exp(arg):
@@ -15,7 +16,7 @@ def exp(arg):
     if isinstance(arg, Quaternion):
         return Quaternion(q_exp(arg.quadruple))
     elif isinstance(arg, numbers.Number):
-        return np.exp(arg)
+        return c_exp(arg)
     elif isinstance(arg, (list, tuple, np.ndarray)):
         result = np.copy(np.array(arg))
         shape = result.shape
@@ -37,7 +38,7 @@ def log(arg):
     if isinstance(arg, Quaternion):
         return Quaternion(q_log(arg.quadruple))
     elif isinstance(arg, numbers.Number):
-        return np.log(arg)
+        return c_log(arg)
     elif isinstance(arg, (list, tuple, np.ndarray)):
         result = np.copy(np.array(arg))
         shape = result.shape

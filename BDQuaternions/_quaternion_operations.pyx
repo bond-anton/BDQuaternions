@@ -47,24 +47,23 @@ cpdef double[:, :] real_matrix(double[:] q):
     :return: 4x4 real matrix as numpy array
     """
     cdef:
-        double a = q[0], b = q[1], c = q[2], d = q[3]
         double[:, :] m = np.empty((4, 4), dtype=np.double)
-    m[0, 0] =  a
-    m[0, 1] =  b
-    m[0, 2] =  c
-    m[0, 3] =  d
-    m[1, 0] = -b
-    m[1, 1] =  a
-    m[1, 2] = -d
-    m[1, 3] =  c
-    m[2, 0] = -c
-    m[2, 1] =  d
-    m[2, 2] =  a
-    m[2, 3] = -b
-    m[3, 0] = -d
-    m[3, 1] = -c
-    m[3, 2] =  b
-    m[3, 3] =  a
+    m[0][0] =  q[0]
+    m[0][1] =  q[1]
+    m[0][2] =  q[2]
+    m[0][3] =  q[3]
+    m[1][0] = -q[1]
+    m[1][1] =  q[0]
+    m[1][2] = -q[3]
+    m[1][3] =  q[2]
+    m[2][0] = -q[2]
+    m[2][1] =  q[3]
+    m[2][2] =  q[0]
+    m[2][3] = -q[1]
+    m[3][0] = -q[3]
+    m[3][1] = -q[2]
+    m[3][2] =  q[1]
+    m[3][3] =  q[0]
     return m
 
 
@@ -77,13 +76,12 @@ cpdef double complex[:, :] complex_matrix(double[:] q):
     :return: 2x2 complex matrix as numpy array
     """
     cdef:
-        double a = q[0], b = q[1], c = q[2], d = q[3]
-        double complex[:, :] result = np.empty((2, 2), dtype=np.complex128)
-    result[0, 0] = a + b * 1j
-    result[0, 1] = c + d * 1j
-    result[1, 0] = -c + d * 1j
-    result[1, 1] = a - b * 1j
-    return result
+        double complex[:, :] cm = np.empty((2, 2), dtype=np.complex128)
+    cm[0][0] = q[0] + q[1]* 1j
+    cm[0][1] = q[2] + q[3] * 1j
+    cm[1][0] = -q[2] + q[3] * 1j
+    cm[1][1] = q[0] - q[1] * 1j
+    return cm
 
 
 cpdef double[:, :] quaternion_to_rotation_matrix(double[:] q):
@@ -118,10 +116,14 @@ cpdef double[:] quaternion_from_rotation_matrix(double[:, :] m):
     :return: quaternion as numpy array of four floats
     """
     cdef:
-        double[:, :] inv_m, k_m
         double det_m, t, r, w, s, x, y, z
-        double[:] w_n
         array[double] quadruple, template = array('d')
+        int n = 4, lwork = 57, liwork = 23, info
+        double k_m[4][4]
+        double work[57]
+        int iwork[23]
+        double w_n[4]
+        char L = b'L', J = b'V'
     quadruple = clone(template, 4, zero=False)
     det_m = _3x3_det(m)
     if abs(1 - det_m ** 2) > 1e-6:
@@ -162,16 +164,27 @@ cpdef double[:] quaternion_from_rotation_matrix(double[:, :] m):
         quadruple[3] = z
     else:
         warnings.warn('Not a rotation matrix. det M = %2.2g' % det_m)
-        k_m = np.array([[m[0, 0] - m[1, 1] - m[2, 2], m[0, 1] + m[1, 0], m[0, 2] + m[2, 0], m[2, 1] - m[1, 2]],
-                        [m[0, 1] + m[1, 0], m[1, 1] - m[0, 0] - m[2, 2], m[1, 2] + m[2, 1], m[0, 2] - m[2, 0]],
-                        [m[0, 2] + m[2, 0], m[1, 2] + m[2, 1], m[2, 2] - m[0, 0] - m[1, 1], m[1, 0] - m[0, 1]],
-                        [m[2, 1] - m[1, 2], m[0, 2] - m[2, 0], m[1, 0] - m[0, 1], m[0, 0] + m[1, 1] + m[2, 2]]]) / 3
-        w_n, v_n = np.linalg.eigh(k_m)
-        q = v_n[[3, 0, 1, 2], np.argmax(w_n)]
-        quadruple[0] = q[0]
-        quadruple[1] = q[1]
-        quadruple[2] = q[2]
-        quadruple[3] = q[3]
+        k_m[0][0] = (m[0, 0] - m[1, 1] - m[2, 2]) / 3.0
+        k_m[0][1] = (m[0, 1] + m[1, 0]) / 3.0
+        k_m[0][2] = (m[0, 2] + m[2, 0]) / 3.0
+        k_m[0][3] = (m[2, 1] - m[1, 2]) / 3.0
+        k_m[1][0] = (m[0, 1] + m[1, 0]) / 3.0
+        k_m[1][1] = (m[1, 1] - m[0, 0] - m[2, 2]) / 3.0
+        k_m[1][2] = (m[1, 2] + m[2, 1]) / 3.0
+        k_m[1][3] = (m[0, 2] - m[2, 0]) / 3.0
+        k_m[2][0] = (m[0, 2] + m[2, 0]) / 3.0
+        k_m[2][1] = (m[1, 2] + m[2, 1]) / 3.0
+        k_m[2][2] = (m[2, 2] - m[0, 0] - m[1, 1]) / 3.0
+        k_m[2][3] = (m[1, 0] - m[0, 1]) / 3.0
+        k_m[3][0] = (m[2, 1] - m[1, 2]) / 3.0
+        k_m[3][1] = (m[0, 2] - m[2, 0]) / 3.0
+        k_m[3][2] = (m[1, 0] - m[0, 1]) / 3.0
+        k_m[3][3] = (m[0, 0] + m[1, 1] + m[2, 2]) / 3.0
+        dsyevd(&J, &L, &n, &k_m[0][0], &n, &w_n[0], &work[0], &lwork, &iwork[0], &liwork, &info)
+        quadruple[0] = k_m[3][3]
+        quadruple[1] = k_m[3][0]
+        quadruple[2] = k_m[3][1]
+        quadruple[3] = k_m[3][2]
     return quadruple
 
 

@@ -14,7 +14,7 @@ cdef class EulerAngles(object):
     cpdef void from_rotation_matrix(self, double[:, :] m, Convention convention)
     cpdef void change_convention(self, Convention new_convention)
 
-    cdef __to_quaternion(self)
+    cdef double[:] __to_quaternion(self)
     cpdef Rotation to_quaternion(self)
 
     cdef void __from_quaternion(self, double[:] quadruple, Convention convention)

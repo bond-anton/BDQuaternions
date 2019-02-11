@@ -2,8 +2,11 @@ from __future__ import division, print_function
 import numbers
 import numpy as np
 
-from ._quaternion_operations cimport norm
+from cython import boundscheck, wraparound
 
+from cpython.array cimport array, clone
+from libc.stdlib cimport rand, RAND_MAX
+from ._quaternion_operations cimport norm
 from .Quaternion cimport Quaternion
 from .UnitQuaternion cimport UnitQuaternion
 from .Rotation cimport Rotation
@@ -14,14 +17,22 @@ cpdef Rotation random_rotation():
     Calculates random rotation quaternion
     :return: random Rotation
     """
-    quadruple = np.array([1, 0, 0, 0], dtype=np.float)
-    random_quadruple_norm = 1.0
+    cdef:
+        double random_quadruple_norm
+        array[double] quadruple, template = array('d')
+    quadruple = clone(template, 4, zero=False)
     while True:
-        quadruple = (np.random.random(4) - 0.5) * 2
+        quadruple[0] = rand()
+        quadruple[1] = rand()
+        quadruple[2] = rand()
+        quadruple[3] = rand()
         random_quadruple_norm = norm(quadruple)
         if random_quadruple_norm > 0:
             break
-    quadruple /= random_quadruple_norm
+    quadruple[0] /= random_quadruple_norm
+    quadruple[1] /= random_quadruple_norm
+    quadruple[2] /= random_quadruple_norm
+    quadruple[3] /= random_quadruple_norm
     return Rotation(quadruple)
 
 
@@ -30,37 +41,50 @@ cpdef UnitQuaternion random_unit_quaternion():
     Calculates random unit quaternion
     :return: random UnitQuaternion
     """
-    quadruple = np.array([1, 0, 0, 0], dtype=np.float)
-    random_quadruple_norm = 1.0
+    cdef:
+        double random_quadruple_norm
+        array[double] quadruple, template = array('d')
+    quadruple = clone(template, 4, zero=False)
     while True:
-        quadruple = (np.random.random(4) - 0.5) * 2
+        quadruple[0] = (rand() / RAND_MAX - 0.5) * 2
+        quadruple[1] = (rand() / RAND_MAX - 0.5) * 2
+        quadruple[2] = (rand() / RAND_MAX - 0.5) * 2
+        quadruple[3] = (rand() / RAND_MAX - 0.5) * 2
         random_quadruple_norm = norm(quadruple)
         if random_quadruple_norm > 0:
             break
-    quadruple /= random_quadruple_norm
+    quadruple[0] /= random_quadruple_norm
+    quadruple[1] /= random_quadruple_norm
+    quadruple[2] /= random_quadruple_norm
+    quadruple[3] /= random_quadruple_norm
     return UnitQuaternion(quadruple)
 
 
-cpdef Quaternion random_quaternion(double quadruple_norm=0.0):
+cpdef Quaternion random_quaternion(double quadruple_norm=1.0):
     """
     Calculates random quaternion
     :return: random Quaternion
     """
-    quadruple = np.array([1, 0, 0, 0], dtype=np.float)
-    random_quadruple_norm = 1
-    nonzero = False
-    if isinstance(quadruple_norm, numbers.Number):
-        nonzero = True
+    cdef:
+        double random_quadruple_norm
+        array[double] quadruple, template = array('d')
+    quadruple = clone(template, 4, zero=False)
     while True:
-        quadruple = (np.random.random(4) - 0.5) * 2
+        quadruple[0] = (rand() / RAND_MAX - 0.5) * 2
+        quadruple[1] = (rand() / RAND_MAX - 0.5) * 2
+        quadruple[2] = (rand() / RAND_MAX - 0.5) * 2
+        quadruple[3] = (rand() / RAND_MAX - 0.5) * 2
         random_quadruple_norm = norm(quadruple)
-        if nonzero and random_quadruple_norm > 0:
-            break
+        if abs(quadruple_norm) > 0.0:
+            if random_quadruple_norm > 0:
+                break
         else:
             break
-    if nonzero:
-        quadruple /= random_quadruple_norm
-        quadruple *= float(quadruple_norm)
+    if random_quadruple_norm > 0:
+        quadruple[0] = quadruple[0] / random_quadruple_norm * abs(quadruple_norm)
+        quadruple[1] = quadruple[1] / random_quadruple_norm * abs(quadruple_norm)
+        quadruple[2] = quadruple[2] / random_quadruple_norm * abs(quadruple_norm)
+        quadruple[3] = quadruple[3] / random_quadruple_norm * abs(quadruple_norm)
     return Quaternion(quadruple)
 
 
@@ -77,7 +101,9 @@ def random_rotations_array(shape):
     return rotations.reshape(shape)
 
 
-def random_unit_quaternions_array(shape):
+@boundscheck(False)
+@wraparound(False)
+cpdef random_unit_quaternions_array(shape):
     """
     Calculates random unit quaternions array
     :return: random UnitQuaternion array of given shape
@@ -90,7 +116,9 @@ def random_unit_quaternions_array(shape):
     return unit_quaternions.reshape(shape)
 
 
-def random_quaternions_array(shape, quadruple_norm=None):
+@boundscheck(False)
+@wraparound(False)
+cpdef random_quaternions_array(shape, double quadruple_norm=1.0):
     """
     Calculates random quaternions array
     :return: random Quaternion array of given shape

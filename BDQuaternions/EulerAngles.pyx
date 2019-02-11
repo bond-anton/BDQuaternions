@@ -3,7 +3,7 @@ import numpy as np
 
 from cython import boundscheck, wraparound
 
-
+from cpython.array cimport array, clone
 from libc.math cimport sin, cos, atan2, sqrt, M_PI
 from libc.float cimport DBL_MIN
 from .EulerAnglesConventions cimport Convention
@@ -51,7 +51,9 @@ cdef class EulerAngles(object):
     @boundscheck(False)
     @wraparound(False)
     cdef double[:] __reduce_euler_angles(self, double[:] euler_angles):
-        cdef reduced_angles = np.empty(3, dtype=np.double)
+        cdef:
+            array[double] reduced_angles, template = array('d')
+        reduced_angles = clone(template, 3, zero=False)
         reduced_angles[0] = self.__reduce_angle(euler_angles[0], center=True, half=False)
         reduced_angles[1] = self.__reduce_angle(euler_angles[1], center=True, half=False)
         reduced_angles[2] = self.__reduce_angle(euler_angles[2], center=True, half=False)
@@ -95,12 +97,14 @@ cdef class EulerAngles(object):
         :return: 3x3 rotation matrix as numpy array of floats
         """
         cdef:
-            double[:] euler_angles = np.empty(3, dtype=np.double)
             Convention parent_convention = self.__convention
             int inner_axis, parity, repetition, frame
             int i, j, k
             double ci, si, cj, sj, ck, sk, cc, ss, cs, sc
             double[:, :] m = np.empty((3,3), dtype=np.double)
+            double[:] euler_angles = np.empty(3, dtype=np.double)
+        #     array[double] euler_angles, template = array('d')
+        # euler_angles = clone(template, 3, zero=False)
         euler_angles[0] = self.__euler_angles[0]
         euler_angles[1] = self.__euler_angles[1]
         euler_angles[2] = self.__euler_angles[2]
@@ -158,12 +162,14 @@ cdef class EulerAngles(object):
         :return: ax, ay, az three Euler angles
         """
         cdef:
-            double[:] euler_angles = np.zeros(3, dtype=np.double)
             Convention parent_convention = convention
             Convention current_convention = convention
             int inner_axis, parity, repetition, frame
             int i, j, k
             double ci, si, cj, sj, ck, sk, sy, cy, ax, ay, az
+            double[:] euler_angles = np.empty(3, dtype=np.double)
+        #     array[double] euler_angles, template = array('d')
+        # euler_angles = clone(template, 3, zero=False)
         while parent_convention.__parent != parent_convention:
             parent_convention = parent_convention.__parent
         inner_axis, parity, repetition, frame = parent_convention.__code
@@ -213,12 +219,13 @@ cdef class EulerAngles(object):
         :param new_convention: dict describing new Euler angles convention
         :return: ax, ay, az three Euler angles
         """
-        cdef double[:, :] m
+        cdef:
+            double[:, :] m
         m = self.rotation_matrix()
         self.from_rotation_matrix(m, new_convention)
 
 
-    cdef __to_quaternion(self):
+    cdef double[:] __to_quaternion(self):
         """
         Convert Euler angles to quaternion
         :return: Quaternion as an array of for floats [w*1, x*i, y*j, z*k]
