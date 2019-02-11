@@ -2,11 +2,13 @@ from __future__ import division, print_function
 import numbers
 import numpy as np
 
+from cython import wraparound, boundscheck
 from cpython.object cimport Py_EQ, Py_NE
 from libc.float cimport DBL_MIN
 
 from .Quaternion cimport Quaternion
 from ._quaternion_operations cimport mul, quaternion_to_rotation_matrix, quaternion_from_rotation_matrix
+from ._helpers cimport matrix_vector_mult, matrix_mult
 from .UnitQuaternion cimport UnitQuaternion
 from .EulerAnglesConventions cimport Conventions, Convention
 from .EulerAngles cimport EulerAngles
@@ -59,7 +61,7 @@ cdef class Rotation(UnitQuaternion):
 
     @property
     def rotation_matrix(self):
-        return quaternion_to_rotation_matrix(self.quadruple)
+        return quaternion_to_rotation_matrix(self.__quadruple)
 
     @rotation_matrix.setter
     def rotation_matrix(self, m):
@@ -168,10 +170,23 @@ cdef class Rotation(UnitQuaternion):
         else:
             return NotImplemented
 
+    @boundscheck(False)
+    @wraparound(False)
     cpdef double[:, :] rotate(self, double[:, :] xyz):
         """
         Apply rotation to vector or array of vectors
         :param xyz: vector or array of vectors
         :return: rotated vector or array of vectors
         """
-        return np.dot(self.rotation_matrix, xyz.T).T
+        cdef:
+            unsigned int i, j, k, rows = xyz.shape[0]
+            double s = 0.0
+            double[:, :] m = quaternion_to_rotation_matrix(self.__quadruple)
+            double[:, :] product = np.empty((rows, 3), dtype=np.double)
+        for i in range(rows):
+            for j in range(3):
+                for k in range(3):
+                    s += xyz[i][k] * m[j][k]
+                product[i][j] = s
+                s = 0.0
+        return product

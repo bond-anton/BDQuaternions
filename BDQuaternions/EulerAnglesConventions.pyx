@@ -457,10 +457,9 @@ cdef class Convention(object):
 
 cdef class Function(object):
     cpdef double[:] evaluate(self, double[:] euler_angles):
-        # cdef:
-        #     array[double] result, template = array('d')
-        # result = clone(template, 3, zero=False)
-        cdef double[:] result = np.zeros(3, dtype=np.double)
+        cdef:
+            array[double] result, template = array('d')
+        result = clone(template, 3, zero=False)
         result[0] = euler_angles[0]
         result[1] = euler_angles[1]
         result[2] = euler_angles[2]
@@ -468,10 +467,9 @@ cdef class Function(object):
 
 cdef class Kocks2Roe(Function):
     cpdef double[:] evaluate(self, double[:] euler_angles):
-        # cdef:
-        #     array[double] result, template = array('d')
-        # result = clone(template, 3, zero=False)
-        cdef double[:] result = np.zeros(3, dtype=np.double)
+        cdef:
+            array[double] result, template = array('d')
+        result = clone(template, 3, zero=False)
         result[0] = euler_angles[0]
         result[1] = euler_angles[1]
         result[2] = M_PI - euler_angles[2]
@@ -479,10 +477,9 @@ cdef class Kocks2Roe(Function):
 
 cdef class Canova2Roe(Function):
     cpdef double[:] evaluate(self, double[:] euler_angles):
-        # cdef:
-        #     array[double] result, template = array('d')
-        # result = clone(template, 3, zero=False)
-        cdef double[:] result = np.zeros(3, dtype=np.double)
+        cdef:
+            array[double] result, template = array('d')
+        result = clone(template, 3, zero=False)
         result[0] = M_PI / 2 - euler_angles[0]
         result[1] = euler_angles[1]
         result[2] = 3 * M_PI / 2 - euler_angles[2]

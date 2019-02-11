@@ -74,7 +74,9 @@ class TestRotation(unittest.TestCase):
 
     def test_rotate(self):
         conventions = Conventions()
-        np.testing.assert_allclose(self.q1.rotate(np.array([[1.0, 0.0, 0.0]])), np.array([[1, 0, 0]]))
+        np.testing.assert_allclose(self.q1.rotate(np.array([[1.0, 0.0, 0.0]])),
+                                   np.array([[1.0, 0, 0]]),
+                                   atol=1.0e-10)
         self.q1.axis_angle = ([0, 0, 1], np.pi / 2)
         self.q1.euler_angles_convention = conventions.get_convention('Bunge')
         self.q1.euler_angles = EulerAngles(np.array([np.pi/2, 0, 0]), self.q1.euler_angles_convention)
@@ -82,7 +84,27 @@ class TestRotation(unittest.TestCase):
                                    np.array([[0.0, 1.0, 0.0]]), atol=np.finfo(float).eps * 4)
         with self.assertRaises(TypeError):
             self.q1.rotate([0, 1])
-        with self.assertRaises(ValueError):
-            self.q1.rotate(np.array([[0, 1], [0, 1], [0, 1], [0, 1]], dtype=np.double))
         with self.assertRaises(TypeError):
             self.q1.rotate('x')
+
+    def test_rotate_time(self):
+        import time
+        conventions = Conventions()
+        np.testing.assert_allclose(self.q1.rotate(np.array([[1.0, 0.0, 0.0]])),
+                                   np.array([[1, 0, 0]]),
+                                   atol=1.0e-10)
+        self.q1.axis_angle = ([0, 0, 1], np.pi / 2)
+        self.q1.euler_angles_convention = conventions.get_convention('Bunge')
+        self.q1.euler_angles = EulerAngles(np.array([np.pi/2, 0, 0]), self.q1.euler_angles_convention)
+        xyz = (np.random.random((1000, 3)) - 0.5) * 100
+        t0 = time.time()
+        for _ in range(10000):
+            result2 = np.dot(self.q1.rotation_matrix, xyz.T).T
+        elapsed2 = time.time() - t0
+        t0 = time.time()
+        for _ in range(10000):
+            result1 = self.q1.rotate(xyz)
+        elapsed1 = time.time() - t0
+        print('Cy:', elapsed1, 'np:', elapsed2)
+        np.testing.assert_allclose(result1, result2)
+

@@ -1,6 +1,5 @@
 from .UnitQuaternion cimport UnitQuaternion
 from .EulerAnglesConventions cimport Convention
-from .EulerAngles cimport EulerAngles
 
 
 cdef class Rotation(UnitQuaternion):

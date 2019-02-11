@@ -1,5 +1,4 @@
 from __future__ import division, print_function
-import numbers
 import numpy as np
 
 from cython import boundscheck, wraparound
@@ -88,7 +87,9 @@ cpdef Quaternion random_quaternion(double quadruple_norm=1.0):
     return Quaternion(quadruple)
 
 
-def random_rotations_array(shape):
+@boundscheck(False)
+@wraparound(False)
+cpdef random_rotations_array(shape):
     """
     Calculates random rotation quaternions array
     :return: random Rotation array of given shape

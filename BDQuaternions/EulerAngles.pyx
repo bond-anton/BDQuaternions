@@ -102,9 +102,9 @@ cdef class EulerAngles(object):
             int i, j, k
             double ci, si, cj, sj, ck, sk, cc, ss, cs, sc
             double[:, :] m = np.empty((3,3), dtype=np.double)
-            double[:] euler_angles = np.empty(3, dtype=np.double)
-        #     array[double] euler_angles, template = array('d')
-        # euler_angles = clone(template, 3, zero=False)
+            double[:] euler_angles
+            array[double] template = array('d')
+        euler_angles = clone(template, 3, zero=False)
         euler_angles[0] = self.__euler_angles[0]
         euler_angles[1] = self.__euler_angles[1]
         euler_angles[2] = self.__euler_angles[2]
@@ -167,9 +167,9 @@ cdef class EulerAngles(object):
             int inner_axis, parity, repetition, frame
             int i, j, k
             double ci, si, cj, sj, ck, sk, sy, cy, ax, ay, az
-            double[:] euler_angles = np.empty(3, dtype=np.double)
-        #     array[double] euler_angles, template = array('d')
-        # euler_angles = clone(template, 3, zero=False)
+            double[:] euler_angles
+            array[double] template = array('d')
+        euler_angles = clone(template, 3, zero=False)
         while parent_convention.__parent != parent_convention:
             parent_convention = parent_convention.__parent
         inner_axis, parity, repetition, frame = parent_convention.__code
