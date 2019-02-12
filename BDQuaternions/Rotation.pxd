@@ -7,5 +7,5 @@ cdef class Rotation(UnitQuaternion):
 
     cpdef Rotation conjugate(self)
     cpdef Rotation reciprocal(self)
-
+    cpdef double[:] rotate_vector(self, double[:] xyz)
     cpdef double[:, :] rotate(self, double[:, :] xyz)

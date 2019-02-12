@@ -8,7 +8,7 @@ from libc.float cimport DBL_MIN
 
 from .Quaternion cimport Quaternion
 from ._quaternion_operations cimport mul, quaternion_to_rotation_matrix, quaternion_from_rotation_matrix
-from ._helpers cimport matrix_vector_mult, matrix_mult
+from ._helpers cimport matrix_vector_mult
 from .UnitQuaternion cimport UnitQuaternion
 from .EulerAnglesConventions cimport Conventions, Convention
 from .EulerAngles cimport EulerAngles
@@ -169,6 +169,16 @@ cdef class Rotation(UnitQuaternion):
                 return Quaternion(y.quadruple) * x
         else:
             return NotImplemented
+
+    @boundscheck(False)
+    @wraparound(False)
+    cpdef double[:] rotate_vector(self, double[:] xyz):
+        """
+        Apply rotation to vector
+        :param xyz: vector
+        :return: rotated vector
+        """
+        return matrix_vector_mult(quaternion_to_rotation_matrix(self.__quadruple), xyz, 3, 3)
 
     @boundscheck(False)
     @wraparound(False)

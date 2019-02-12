@@ -72,6 +72,21 @@ class TestRotation(unittest.TestCase):
         v_r_q = (self.q1 * qv * self.q1.reciprocal()).quadruple[1:]
         np.testing.assert_allclose(v_r_m, v_r_q, atol=np.finfo(float).eps * 4)
 
+    def test_rotate_vector(self):
+        conventions = Conventions()
+        np.testing.assert_allclose(self.q1.rotate_vector(np.array([1.0, 0.0, 0.0])),
+                                   np.array([1.0, 0, 0]),
+                                   atol=1.0e-10)
+        self.q1.axis_angle = ([0, 0, 1], np.pi / 2)
+        self.q1.euler_angles_convention = conventions.get_convention('Bunge')
+        self.q1.euler_angles = EulerAngles(np.array([np.pi / 2, 0, 0]), self.q1.euler_angles_convention)
+        np.testing.assert_allclose(self.q1.rotate_vector(np.array([1.0, 0.0, 0.0])),
+                                   np.array([0.0, 1.0, 0.0]), atol=np.finfo(float).eps * 4)
+        with self.assertRaises(TypeError):
+            self.q1.rotate([0, 1])
+        with self.assertRaises(TypeError):
+            self.q1.rotate('x')
+
     def test_rotate(self):
         conventions = Conventions()
         np.testing.assert_allclose(self.q1.rotate(np.array([[1.0, 0.0, 0.0]])),
