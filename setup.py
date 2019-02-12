@@ -1,4 +1,5 @@
 from setuptools import setup, find_packages
+from setuptools.extension import Extension
 from Cython.Build import cythonize
 
 from codecs import open
@@ -21,6 +22,54 @@ else:
 readme_file = path.join(here, 'README.md')
 with open(readme_file, encoding='utf-8') as f:
     long_description = f.read()
+
+extensions = [
+    Extension(
+        'BDQuaternions._helpers',
+        ['BDQuaternions/_helpers.pyx'],
+        depends=['BDQuaternions._helpers.pxd'],
+    ),
+    Extension(
+        'BDQuaternions._quaternion_operations',
+        ['BDQuaternions/_quaternion_operations.pyx'],
+        depends=['BDQuaternions/_quaternion_operations.pxd'],
+    ),
+    Extension(
+        'BDQuaternions.Quaternion',
+        ['BDQuaternions/Quaternion.pyx'],
+        depends=['BDQuaternions/Quaternion.pxd'],
+    ),
+    Extension(
+        'BDQuaternions.UnitQuaternion',
+        ['BDQuaternions/UnitQuaternion.pyx'],
+        depends=['BDQuaternions/UnitQuaternion.pxd'],
+    ),
+    Extension(
+        'BDQuaternions.EulerAnglesConventions',
+        ['BDQuaternions/EulerAnglesConventions.pyx'],
+        depends=['BDQuaternions/EulerAnglesConventions.pxd'],
+    ),
+    Extension(
+        'BDQuaternions.EulerAngles',
+        ['BDQuaternions/EulerAngles.pyx'],
+        depends=['BDQuaternions/EulerAngles.pxd'],
+    ),
+    Extension(
+        'BDQuaternions.Rotation',
+        ['BDQuaternions/Rotation.pyx'],
+        depends=['BDQuaternions/Rotation.pxd'],
+    ),
+    Extension(
+        'BDQuaternions.functions',
+        ['BDQuaternions/functions.pyx'],
+        depends=['BDQuaternions/functions.pxd'],
+    ),
+    Extension(
+        'BDQuaternions.utils',
+        ['BDQuaternions/utils.pyx'],
+        depends=['BDQuaternions/utils.pxd'],
+    ),
+]
 
 setup(
     name=package_name,
@@ -54,8 +103,7 @@ setup(
     keywords='Quaternion 3D rotations',
 
     packages=find_packages(exclude=['demo', 'tests', 'docs', 'contrib', 'venv']),
-    ext_modules=cythonize('BDQuaternions/*.pyx',
-                          compiler_directives={'language_level': 3}),
+    ext_modules=cythonize(extensions, compiler_directives={'language_level': 3}),
     package_data={'BDQuaternions': ['*.pxd']},
     install_requires=['numpy', 'scipy', 'Cython'],
     test_suite='nose.collector',

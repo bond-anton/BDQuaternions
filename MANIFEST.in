@@ -4,3 +4,12 @@ include NOTICE.txt
 
 # Include README
 include README.md
+
+# Include Cython sources
+recursive-include BDQuaternions *.pyx
+recursive-include BDQuaternions *.pxd
+
+recursive-exclude build *
+recursive-exclude dist *
+recursive-exclude tools *
+recursive-exclude venv *
