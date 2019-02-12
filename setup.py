@@ -1,5 +1,4 @@
 from setuptools import setup, find_packages
-import sys
 from Cython.Build import cythonize
 
 from codecs import open
@@ -45,17 +44,18 @@ setup(
         'License :: OSI Approved :: Apache Software License',
         'Topic :: Scientific/Engineering :: Mathematics',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
 
     keywords='Quaternion 3D rotations',
 
-    packages=find_packages(exclude=['demo', 'tests', 'docs', 'contrib', 'venv', 'venv_2.7']),
+    packages=find_packages(exclude=['demo', 'tests', 'docs', 'contrib', 'venv']),
     ext_modules=cythonize('BDQuaternions/*.pyx',
-                          compiler_directives={'language_level': sys.version_info[0]}),
+                          compiler_directives={'language_level': 3}),
     package_data={'BDQuaternions': ['*.pxd']},
     install_requires=['numpy', 'scipy', 'Cython'],
     test_suite='nose.collector',
