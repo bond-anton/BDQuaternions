@@ -24,7 +24,7 @@ cdef class UnitQuaternion(Quaternion):
         """
         return UnitQuaternion(self.__conjugate())
 
-    cpdef reciprocal(self):
+    cpdef UnitQuaternion reciprocal(self):
         """
         for Unit quaternion reciprocal is equal to conjugate
         :return: Unit quaternion reciprocal to current quaternion

@@ -113,13 +113,12 @@ class TestRotation(unittest.TestCase):
         self.q1.euler_angles = EulerAngles(np.array([np.pi/2, 0, 0]), self.q1.euler_angles_convention)
         xyz = (np.random.random((1000, 3)) - 0.5) * 100
         t0 = time.time()
-        for _ in range(10000):
+        for _ in range(100):
             result2 = np.dot(self.q1.rotation_matrix, xyz.T).T
         elapsed2 = time.time() - t0
         t0 = time.time()
-        for _ in range(10000):
+        for _ in range(100):
             result1 = self.q1.rotate(xyz)
         elapsed1 = time.time() - t0
         print('Cy:', elapsed1, 'np:', elapsed2)
         np.testing.assert_allclose(result1, result2)
-

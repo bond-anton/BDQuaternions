@@ -3,14 +3,14 @@ cdef class Quaternion(object):
         double[:] __quadruple
 
     cpdef double scalar_part(self)
-    cdef double[:] __vector_part(self)
+    cpdef double[:] vector_part(self)
     cdef double[:] __conjugate(self)
     cpdef Quaternion conjugate(self)
 
-    cpdef norm(self)
-    cpdef distance(self, Quaternion other)
-    cpdef versor(self)
-    cpdef reciprocal(self)
+    cpdef double norm(self)
+    cpdef double distance(self, Quaternion other)
+    cpdef Quaternion versor(self)
+    cpdef Quaternion reciprocal(self)
 
-    cpdef real_matrix(self)
-    cpdef complex_matrix(self)
+    cpdef double[:, :] real_matrix(self)
+    cpdef double complex[:, :] complex_matrix(self)

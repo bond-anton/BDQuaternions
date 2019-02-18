@@ -1,5 +1,5 @@
 cpdef double[:] mul(double[:] q1, double[:] q2)
-cpdef double norm(double[:] quadruple)
+cpdef double norm(double[:] quadruple) nogil
 
 cpdef double[:, :] real_matrix(double[:] q)
 cpdef double complex[:, :] complex_matrix(double[:] q)

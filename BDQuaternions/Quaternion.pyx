@@ -2,6 +2,8 @@ from __future__ import division, print_function
 import numpy as np
 import numbers
 
+from cython import boundscheck, wraparound
+
 from libc.math cimport sqrt, cos, sin, acos
 from cpython.array cimport array, clone
 from cpython.object cimport Py_EQ, Py_NE
@@ -48,6 +50,7 @@ cdef class Quaternion(object):
         self.__quadruple[2] = quadruple[2]
         self.__quadruple[3] = quadruple[3]
 
+    @boundscheck(False)
     cpdef double scalar_part(self):
         """
         Calculates scalar part of the Quaternion
@@ -55,19 +58,18 @@ cdef class Quaternion(object):
         """
         return self.__quadruple[0]
 
-    cdef double[:] __vector_part(self):
-        return self.__quadruple[1:]
-
-    def vector_part(self):
+    @boundscheck(False)
+    cpdef double[:] vector_part(self):
         """
         Calculates vector part of the Quaternion
         :return: vector part of the Quaternion
         """
-        return np.asarray(self.__vector_part())
+        return self.__quadruple[1:4]
 
+    @boundscheck(False)
     cdef double[:] __conjugate(self):
         cdef:
-            double[:] v_part = self.__vector_part()
+            double[:] v_part = self.vector_part()
             array[double] quadruple, template = array('d')
         quadruple = clone(template, 4, zero=False)
         quadruple[0] = self.scalar_part()
@@ -113,14 +115,14 @@ cdef class Quaternion(object):
         else:
             return NotImplemented
 
-    cpdef norm(self):
+    cpdef double norm(self):
         """
         Calculates the norm of the Quaternion
         :return: norm of Quaternion
         """
         return norm(self.__quadruple)
 
-    cpdef distance(self, Quaternion other):
+    cpdef double distance(self, Quaternion other):
         """
         Calculates distance between two quaternions
         :param other: other Quaternion
@@ -128,14 +130,14 @@ cdef class Quaternion(object):
         """
         return (self - other).norm()
 
-    cpdef versor(self):
+    cpdef Quaternion versor(self):
         """
         Return versor for current quaternion
         :return: Quaternion which is versor for the given quaternion
         """
         return 1 / self.norm() * self
 
-    cpdef reciprocal(self):
+    cpdef Quaternion reciprocal(self):
         """
         Return quaternion reciprocal to given
         """
@@ -167,18 +169,30 @@ cdef class Quaternion(object):
     """
     @property
     def polar(self):
+        cdef:
+            double a, v_norm, theta
+            double[:] v
+            array[double] n_hat, template = array('d')
+        n_hat = clone(template, 3, zero=False)
         if not np.allclose(self.norm(), [0.0]):
             a = self.scalar_part()
             v = self.vector_part()
             v_norm = sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2])
-            if not np.allclose(v_norm, 0.0):
-                n_hat = v / v_norm
+            if v_norm > 0.0:
+                n_hat[0] = v[0] / v_norm
+                n_hat[1] = v[1] / v_norm
+                n_hat[2] = v[2] / v_norm
             else:
-                n_hat = np.zeros(3)
+                n_hat[0] = 0.0
+                n_hat[1] = 0.0
+                n_hat[2] = 0.0
             theta = acos(a / self.norm())
             return self.norm(), n_hat, theta
         else:
-            return 0, np.zeros(3), 0
+            n_hat[0] = 0.0
+            n_hat[1] = 0.0
+            n_hat[2] = 0.0
+            return 0.0, n_hat, 0.0
 
     @polar.setter
     def polar(self, polar_components):
@@ -198,14 +212,14 @@ cdef class Quaternion(object):
         else:
             return NotImplemented
 
-    cpdef real_matrix(self):
+    cpdef double[:, :] real_matrix(self):
         """
         Calculates real 4x4 matrix representation of the quaternion
         :return: 4x4 real numpy array matrix
         """
         return real_matrix(self.__quadruple)
 
-    cpdef complex_matrix(self):
+    cpdef double complex[:, :] complex_matrix(self):
         """
         Calculates complex 2x2 matrix representation of the quaternion
         :return: 2x2 complex numpy array matrix

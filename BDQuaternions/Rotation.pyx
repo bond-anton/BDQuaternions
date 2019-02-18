@@ -3,7 +3,9 @@ import numbers
 import numpy as np
 
 from cython import wraparound, boundscheck
+
 from cpython.object cimport Py_EQ, Py_NE
+from libc.math cimport fabs
 from libc.float cimport DBL_MIN
 
 from .Quaternion cimport Quaternion
@@ -154,16 +156,16 @@ cdef class Rotation(UnitQuaternion):
             quadruple = mul(x.quadruple, y.quadruple)
             return Quaternion(quadruple)
         elif isinstance(x, Rotation) and isinstance(y, numbers.Number):
-            if abs(float(y) - 1) < 4 * DBL_MIN:
+            if fabs(float(y) - 1) < 4 * DBL_MIN:
                 return Rotation(x.quadruple, euler_angles_convention=x.euler_angles_convention)
-            elif abs(float(y) + 1) < 4 * DBL_MIN:
+            elif fabs(float(y) + 1) < 4 * DBL_MIN:
                 return Rotation(-1 * x.quadruple, euler_angles_convention=x.euler_angles_convention)
             else:
                 return Quaternion(x.quadruple) * y
         elif isinstance(x, numbers.Number) and isinstance(y, Rotation):
-            if abs(float(x) - 1) < 4 * DBL_MIN:
+            if fabs(float(x) - 1) < 4 * DBL_MIN:
                 return Rotation(y.quadruple, euler_angles_convention=y.euler_angles_convention)
-            elif abs(float(x) + 1) < 4 * DBL_MIN:
+            elif fabs(float(x) + 1) < 4 * DBL_MIN:
                 return Rotation(-1 * y.quadruple, euler_angles_convention=y.euler_angles_convention)
             else:
                 return Quaternion(y.quadruple) * x
@@ -189,14 +191,11 @@ cdef class Rotation(UnitQuaternion):
         :return: rotated vector or array of vectors
         """
         cdef:
-            unsigned int i, j, k, rows = xyz.shape[0]
-            double s = 0.0
+            int i, j, k, rows = xyz.shape[0]
             double[:, :] m = quaternion_to_rotation_matrix(self.__quadruple)
-            double[:, :] product = np.empty((rows, 3), dtype=np.double)
+            double[:, :] product = np.zeros((rows, 3), dtype=np.double)
         for i in range(rows):
             for j in range(3):
                 for k in range(3):
-                    s += xyz[i][k] * m[j][k]
-                product[i][j] = s
-                s = 0.0
+                    product[i][j] += xyz[i][k] * m[j][k]
         return product

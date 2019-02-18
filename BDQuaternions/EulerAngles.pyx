@@ -4,7 +4,7 @@ import numpy as np
 from cython import boundscheck, wraparound
 
 from cpython.array cimport array, clone
-from libc.math cimport sin, cos, atan2, sqrt, M_PI
+from libc.math cimport sin, cos, atan2, sqrt, M_PI, fabs
 from libc.float cimport DBL_MIN
 from .EulerAnglesConventions cimport Convention
 from ._quaternion_operations cimport quaternion_to_rotation_matrix, quaternion_from_rotation_matrix
@@ -22,7 +22,7 @@ cdef class EulerAngles(object):
         self.__euler_angles = self.__reduce_euler_angles(euler_angles)
         self.__convention = convention
 
-    cdef double __reduce_angle(self, double angle, bint center=True, bint half=False):
+    cdef double __reduce_angle(self, double angle, bint center=True, bint half=False) nogil:
         """
         Adjusts rotation angle to be in the range [-2*pi; 2*pi]
         :param angle: angle or array-like of input angle
@@ -35,7 +35,7 @@ cdef class EulerAngles(object):
         if angle > 2 * M_PI:
             reduced_angle = angle - 2 * M_PI * (angle // (2 * M_PI))
         elif angle < -2 * M_PI:
-            reduced_angle = angle + 2 * M_PI * (abs(angle) // (2 * M_PI))
+            reduced_angle = angle + 2 * M_PI * (fabs(angle) // (2 * M_PI))
         else:
             reduced_angle = angle
         if center:

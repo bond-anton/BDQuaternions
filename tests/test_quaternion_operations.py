@@ -52,7 +52,10 @@ class TestQuaternionOperations(unittest.TestCase):
             m[:, 1] = -m[:, 1]
             d = -d
         m = (d**(-1 / 3)) * m
+        m[0, 0] += 1e-8
         with warnings.catch_warnings(record=True) as w:
+            print('WWW')
+            print(w)
             warnings.simplefilter('always')
             qo.quaternion_from_rotation_matrix(m)
             self.assertTrue(len(w) == 1)

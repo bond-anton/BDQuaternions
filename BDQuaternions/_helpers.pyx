@@ -5,7 +5,7 @@ from cpython.array cimport array, clone
 
 @boundscheck(False)
 @wraparound(False)
-cdef double trace(double[:, :] m, int n):
+cdef double trace(double[:, :] m, int n) nogil:
     cdef:
         double res = 0.0
         int i
@@ -16,7 +16,7 @@ cdef double trace(double[:, :] m, int n):
 
 @boundscheck(False)
 @wraparound(False)
-cdef double vectors_dot_prod(double[:] x, double[:] y, int n):
+cdef double vectors_dot_prod(double[:] x, double[:] y, int n) nogil:
     cdef:
         double res = 0.0
         int i
@@ -37,16 +37,19 @@ cdef double[:] matrix_vector_mult(double[:, :] mat, double[:] vec, int rows, int
     return result
 
 
-cdef double _2x2_det(double[:, :] m):
+@boundscheck(False)
+cdef double _2x2_det(double[:, :] m) nogil:
     return m[0, 0] * m[1, 1] - m[0, 1] * m[1, 0]
 
 
-cdef double _3x3_det(double[:, :] m):
+@boundscheck(False)
+cdef double _3x3_det(double[:, :] m) nogil:
     return m[0, 0] * (m[1, 1] * m[2, 2] - m[1, 2] * m[2, 1]) \
          - m[0, 1] * (m[1, 0] * m[2, 2] - m[1, 2] * m[2, 0]) \
          + m[0, 2] * (m[1, 0] * m[2, 1] - m[1, 1] * m[2, 0])
 
 
+@boundscheck(False)
 cdef double[:, :] _3x3_inv(double[:, :] m):
     cdef:
         double det = _3x3_det(m)
@@ -68,14 +71,12 @@ cdef double[:, :] _3x3_inv(double[:, :] m):
 cdef double[:, :] matrix_mult(double[:, :] m1, double[:, :] m2, int rows, int cols, int n):
     cdef:
         int i, j, k
-        double s = 0.0
         double[:, :] product = np.empty((rows, cols), dtype=np.double)
     for i in range(rows):
         for j in range(cols):
+            product[i][j] = 0.0
             for k in range(n):
-                s += m1[i][k] * m2[k][j]
-            product[i][j] = s
-            s = 0.0
+                product[i][j] += m1[i][k] * m2[k][j]
     return product
 
 

@@ -2,6 +2,7 @@ from __future__ import division, print_function
 import numpy as np
 
 from cython import boundscheck, wraparound
+
 from cpython.array cimport array, clone
 from cpython.object cimport Py_EQ, Py_NE
 from libc.math cimport M_PI
@@ -456,6 +457,8 @@ cdef class Convention(object):
 
 
 cdef class Function(object):
+
+    @boundscheck(False)
     cpdef double[:] evaluate(self, double[:] euler_angles):
         cdef:
             array[double] result, template = array('d')
@@ -466,6 +469,8 @@ cdef class Function(object):
         return result
 
 cdef class Kocks2Roe(Function):
+
+    @boundscheck(False)
     cpdef double[:] evaluate(self, double[:] euler_angles):
         cdef:
             array[double] result, template = array('d')
@@ -476,6 +481,8 @@ cdef class Kocks2Roe(Function):
         return result
 
 cdef class Canova2Roe(Function):
+
+    @boundscheck(False)
     cpdef double[:] evaluate(self, double[:] euler_angles):
         cdef:
             array[double] result, template = array('d')

@@ -2,6 +2,8 @@ from __future__ import division, print_function
 import warnings
 import numpy as np
 
+from cython import boundscheck, wraparound
+
 from cpython.array cimport array, clone
 from libc.math cimport sqrt, cos, sin, acos
 from libc.math cimport exp as c_exp, log as c_log
@@ -10,6 +12,7 @@ from scipy.linalg.cython_lapack cimport dsyevd
 from ._helpers cimport _3x3_det, trace, check_orthogonal
 
 
+@boundscheck(False)
 cpdef double[:] mul(double[:] q1, double[:] q2):
     """
     Multiplication of two quaternions
@@ -27,7 +30,8 @@ cpdef double[:] mul(double[:] q1, double[:] q2):
     return quadruple
 
 
-cpdef double norm(double[:] q):
+@boundscheck(False)
+cpdef double norm(double[:] q) nogil:
     """
     Calculates norm of quaternion
     :param q: quaternion as an iterable of four numbers
@@ -35,7 +39,7 @@ cpdef double norm(double[:] q):
     """
     return sqrt(q[0] * q[0] + q[1] * q[1] + q[2] * q[2] + q[3] * q[3])
 
-
+@boundscheck(False)
 cpdef double[:, :] real_matrix(double[:] q):
     """
     returns 4x4 real matrix representation of quaternion
@@ -67,6 +71,7 @@ cpdef double[:, :] real_matrix(double[:] q):
     return m
 
 
+@boundscheck(False)
 cpdef double complex[:, :] complex_matrix(double[:] q):
     """
     returns 2x2 complex matrix representation of quaternion
@@ -84,6 +89,7 @@ cpdef double complex[:, :] complex_matrix(double[:] q):
     return cm
 
 
+@boundscheck(False)
 cpdef double[:, :] quaternion_to_rotation_matrix(double[:] q):
     """
     Convert versor corresponding to given quaternion to rotation 3x3 matrix
@@ -109,6 +115,7 @@ cpdef double[:, :] quaternion_to_rotation_matrix(double[:] q):
     return m
 
 
+@boundscheck(False)
 cpdef double[:] quaternion_from_rotation_matrix(double[:, :] m):
     """
     Convert 3x3 rotation matrix to quaternion
@@ -188,6 +195,7 @@ cpdef double[:] quaternion_from_rotation_matrix(double[:, :] m):
     return quadruple
 
 
+@boundscheck(False)
 cpdef double[:] exp(double[:] q):
     """
     Calculates exp() function on quaternion
@@ -212,6 +220,7 @@ cpdef double[:] exp(double[:] q):
     return result
 
 
+@boundscheck(False)
 cpdef double[:] log(double[:] q):
     """
     Calculates log() function on quaternion
