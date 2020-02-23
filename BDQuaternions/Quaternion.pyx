@@ -1,4 +1,3 @@
-from __future__ import division, print_function
 import numpy as np
 import numbers
 
@@ -50,6 +49,7 @@ cdef class Quaternion(object):
         self.__quadruple[2] = quadruple[2]
         self.__quadruple[3] = quadruple[3]
 
+    @wraparound(False)
     @boundscheck(False)
     cpdef double scalar_part(self):
         """
@@ -58,6 +58,7 @@ cdef class Quaternion(object):
         """
         return self.__quadruple[0]
 
+    @wraparound(False)
     @boundscheck(False)
     cpdef double[:] vector_part(self):
         """
@@ -66,6 +67,7 @@ cdef class Quaternion(object):
         """
         return self.__quadruple[1:4]
 
+    @wraparound(False)
     @boundscheck(False)
     cdef double[:] __conjugate(self):
         cdef:
@@ -115,12 +117,16 @@ cdef class Quaternion(object):
         else:
             return NotImplemented
 
-    cpdef double norm(self):
+    cpdef double _norm(self):
         """
         Calculates the norm of the Quaternion
         :return: norm of Quaternion
         """
         return norm(self.__quadruple)
+
+    @property
+    def norm(self):
+        return self._norm()
 
     cpdef double distance(self, Quaternion other):
         """
@@ -128,20 +134,20 @@ cdef class Quaternion(object):
         :param other: other Quaternion
         :return: distance to other Quaternion
         """
-        return (self - other).norm()
+        return (self - other)._norm()
 
     cpdef Quaternion versor(self):
         """
         Return versor for current quaternion
         :return: Quaternion which is versor for the given quaternion
         """
-        return 1 / self.norm() * self
+        return 1 / self._norm() * self
 
     cpdef Quaternion reciprocal(self):
         """
         Return quaternion reciprocal to given
         """
-        return 1 / (self.norm() ** 2) * self.conjugate()
+        return 1 / (self._norm() ** 2) * self.conjugate()
 
     def __div__(x, y):
         if isinstance(x, Quaternion) and isinstance(y, Quaternion):
@@ -174,7 +180,7 @@ cdef class Quaternion(object):
             double[:] v
             array[double] n_hat, template = array('d')
         n_hat = clone(template, 3, zero=False)
-        if not np.allclose(self.norm(), [0.0]):
+        if not np.allclose(self._norm(), [0.0]):
             a = self.scalar_part()
             v = self.vector_part()
             v_norm = sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2])
@@ -186,8 +192,8 @@ cdef class Quaternion(object):
                 n_hat[0] = 0.0
                 n_hat[1] = 0.0
                 n_hat[2] = 0.0
-            theta = acos(a / self.norm())
-            return self.norm(), n_hat, theta
+            theta = acos(a / self._norm())
+            return self._norm(), n_hat, theta
         else:
             n_hat[0] = 0.0
             n_hat[1] = 0.0

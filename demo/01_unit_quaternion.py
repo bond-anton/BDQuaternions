@@ -1,7 +1,6 @@
-from __future__ import division, print_function
 import numpy as np
 
-from BDQuaternions import Quaternion, UnitQuaternion
+from BDQuaternions import UnitQuaternion
 from BDQuaternions import functions as qt
 
 q1 = UnitQuaternion()
@@ -16,8 +15,8 @@ print('q1 + q2 =', q1 + q2)
 print('q1 - q2 =', q1 - q2)
 print('q1 * q2 =', q1 * q2)
 print('q1 == q2:', q1 == q2, '\tq1 == q1:', q1 == q1)
-print('||q1|| =', q1.norm())
-print('||q2|| =', q2.norm())
+print('||q1|| =', q1.norm)
+print('||q2|| =', q2.norm)
 print('distance d(q1,q2) =', q1.distance(q2))
 print('q1 versor =', q1.versor())
 print('q2 versor =', q2.versor())

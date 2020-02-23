@@ -7,7 +7,7 @@ cdef class Quaternion(object):
     cdef double[:] __conjugate(self)
     cpdef Quaternion conjugate(self)
 
-    cpdef double norm(self)
+    cpdef double _norm(self)
     cpdef double distance(self, Quaternion other)
     cpdef Quaternion versor(self)
     cpdef Quaternion reciprocal(self)

@@ -1,4 +1,3 @@
-from __future__ import division
 import sys
 import unittest
 import numpy as np
@@ -72,28 +71,28 @@ class TestQuaternion(unittest.TestCase):
         self.assertNotEqual((self.q1 * self.q2).conjugate(), self.q1.conjugate() * self.q2.conjugate())
 
     def test_norm(self):
-        np.testing.assert_allclose(self.q1.norm(), 1.0)
-        np.testing.assert_allclose((3 * self.q1).norm(), 3.0)
-        np.testing.assert_allclose((self.q1 * self.q2).norm(), self.q1.norm() * self.q2.norm())
-        np.testing.assert_allclose((self.q2 * self.q1).norm(), self.q1.norm() * self.q2.norm())
+        np.testing.assert_allclose(self.q1.norm, 1.0)
+        np.testing.assert_allclose((3 * self.q1).norm, 3.0)
+        np.testing.assert_allclose((self.q1 * self.q2).norm, self.q1.norm * self.q2.norm)
+        np.testing.assert_allclose((self.q2 * self.q1).norm, self.q1.norm * self.q2.norm)
 
     def test_distance(self):
-        self.assertEqual(self.q1.distance(self.q2), (self.q1 - self.q2).norm())
-        self.assertEqual(self.q2.distance(self.q1), (self.q1 - self.q2).norm())
+        self.assertEqual(self.q1.distance(self.q2), (self.q1 - self.q2).norm)
+        self.assertEqual(self.q2.distance(self.q1), (self.q1 - self.q2).norm)
         self.assertEqual(self.q1.distance(self.q2), self.q2.distance(self.q1))
         self.assertEqual(self.q1.distance(self.q1), 0)
         with self.assertRaises(TypeError):
             self.q1.distance('x')
 
     def test_versor(self):
-        np.testing.assert_allclose(self.q1.versor().norm(), 1)
-        np.testing.assert_allclose(self.q2.versor().norm(), 1)
+        np.testing.assert_allclose(self.q1.versor().norm, 1)
+        np.testing.assert_allclose(self.q2.versor().norm, 1)
         self.assertRaises(ZeroDivisionError, Quaternion(np.array([0, 0, 0, 0], dtype=np.double)).versor)
 
     def test_reciprocal(self):
         self.assertRaises(ZeroDivisionError, Quaternion(np.array([0, 0, 0, 0], dtype=np.double)).reciprocal)
         self.assertEqual(self.q1.reciprocal(), self.q1.conjugate())
-        self.assertEqual(self.q2.reciprocal(), self.q2.conjugate() * (1 / self.q2.norm() ** 2))
+        self.assertEqual(self.q2.reciprocal(), self.q2.conjugate() * (1 / self.q2.norm ** 2))
 
     def test_division(self):
         with self.assertRaises(TypeError):

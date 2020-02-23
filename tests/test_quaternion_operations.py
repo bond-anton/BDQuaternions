@@ -1,4 +1,3 @@
-from __future__ import division
 import warnings
 import numpy as np
 
@@ -46,13 +45,16 @@ class TestQuaternionOperations(unittest.TestCase):
         m = np.eye(4, 4) + 1
         with self.assertRaises(ValueError):
             qo.quaternion_from_rotation_matrix(m)
-        m = np.random.randn(3, 3)
-        d = np.linalg.det(m)
-        if d < 0:
-            m[:, 1] = -m[:, 1]
-            d = -d
-        m = (d**(-1 / 3)) * m
-        m[0, 0] += 1e-8
+        while True:
+            m = np.random.randn(3, 3)
+            d = np.linalg.det(m)
+            if d < 0:
+                m[:, 1] = -m[:, 1]
+                d = -d
+            m = (d**(-1 / 3)) * m
+            m[0, 0] += 1e-8
+            if abs(np.linalg.det(m) ** 2 - 1) < 5e-7:
+                break
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter('always')
             qo.quaternion_from_rotation_matrix(m)

@@ -1,4 +1,3 @@
-from __future__ import division, print_function
 import warnings
 import numpy as np
 
@@ -12,6 +11,7 @@ from scipy.linalg.cython_lapack cimport dsyevd
 from ._helpers cimport _3x3_det, trace, check_orthogonal
 
 
+@wraparound(False)
 @boundscheck(False)
 cpdef double[:] mul(double[:] q1, double[:] q2):
     """
@@ -30,6 +30,7 @@ cpdef double[:] mul(double[:] q1, double[:] q2):
     return quadruple
 
 
+@wraparound(False)
 @boundscheck(False)
 cpdef double norm(double[:] q) nogil:
     """
@@ -39,6 +40,8 @@ cpdef double norm(double[:] q) nogil:
     """
     return sqrt(q[0] * q[0] + q[1] * q[1] + q[2] * q[2] + q[3] * q[3])
 
+
+@wraparound(False)
 @boundscheck(False)
 cpdef double[:, :] real_matrix(double[:] q):
     """
@@ -71,6 +74,7 @@ cpdef double[:, :] real_matrix(double[:] q):
     return m
 
 
+@wraparound(False)
 @boundscheck(False)
 cpdef double complex[:, :] complex_matrix(double[:] q):
     """
@@ -89,6 +93,7 @@ cpdef double complex[:, :] complex_matrix(double[:] q):
     return cm
 
 
+@wraparound(False)
 @boundscheck(False)
 cpdef double[:, :] quaternion_to_rotation_matrix(double[:] q):
     """
@@ -115,6 +120,7 @@ cpdef double[:, :] quaternion_to_rotation_matrix(double[:] q):
     return m
 
 
+@wraparound(False)
 @boundscheck(False)
 cpdef double[:] quaternion_from_rotation_matrix(double[:, :] m):
     """
@@ -195,6 +201,7 @@ cpdef double[:] quaternion_from_rotation_matrix(double[:, :] m):
     return quadruple
 
 
+@wraparound(False)
 @boundscheck(False)
 cpdef double[:] exp(double[:] q):
     """
@@ -220,6 +227,7 @@ cpdef double[:] exp(double[:] q):
     return result
 
 
+@wraparound(False)
 @boundscheck(False)
 cpdef double[:] log(double[:] q):
     """
