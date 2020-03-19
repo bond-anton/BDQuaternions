@@ -1,3 +1,4 @@
+import sys
 from setuptools import setup, find_packages
 from setuptools.extension import Extension
 from setuptools.command.build_ext import build_ext
@@ -148,8 +149,9 @@ setup(
     keywords='Quaternion 3D rotations',
 
     packages=find_packages(exclude=['demo', 'tests', 'docs', 'contrib', 'venv']),
-    ext_modules=cythonize(extensions, compiler_directives={'language_level': 3}),
+    ext_modules=cythonize(extensions, compiler_directives={'language_level': sys.version_info[0]}),
     package_data={'BDQuaternions': ['*.pxd']},
+    setup_requires=['numpy', 'scipy', 'Cython'],
     install_requires=['numpy', 'scipy', 'Cython'],
     test_suite='nose.collector',
     tests_require=['nose'],
