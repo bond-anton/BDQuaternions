@@ -210,17 +210,19 @@ cpdef double[:] exp(double[:] q):
     :return: result quaternion as numpy array of four floats
     """
     cdef:
-        double v_norm, a = q[0], b = q[1], c = q[2], d = q[3]
+        double v_norm, a1, sin_v_norm, a = q[0], b = q[1], c = q[2], d = q[3]
         array[double] result, template = array('d')
     result = clone(template, 4, zero=False)
     v_norm = sqrt(b * b + c * c + d * d)
+    a1 = c_exp(a)
     if v_norm > 0.0:
-        result[0] = c_exp(a) * cos(v_norm)
-        result[1] = c_exp(a) * b / v_norm * sin(v_norm)
-        result[2] = c_exp(a) * c / v_norm * sin(v_norm)
-        result[3] = c_exp(a) * d / v_norm * sin(v_norm)
+        sin_v_norm = a1 * sin(v_norm) / v_norm
+        result[0] = a1 * cos(v_norm)
+        result[1] = b * sin_v_norm
+        result[2] = c * sin_v_norm
+        result[3] = d * sin_v_norm
     else:
-        result[0] = c_exp(a)
+        result[0] = a1
         result[1] = 0.0
         result[2] = 0.0
         result[3] = 0.0
@@ -236,14 +238,15 @@ cpdef double[:] log(double[:] q):
     :return: result quaternion as numpy array of four floats
     """
     cdef:
-        double q_norm, v_norm, a = q[0], b = q[1], c = q[2], d = q[3]
+        double q_norm, v_norm, acos_a_q_norm, a = q[0], b = q[1], c = q[2], d = q[3]
         array[double] result, template = array('d')
     result = clone(template, 4, zero=False)
     q_norm = norm(q)
     v_norm = sqrt(b * b + c * c + d * d)
     result[0] = c_log(q_norm)
     if v_norm > 0.0:
-        result[1] = b / v_norm * acos(a / q_norm)
-        result[2] = c / v_norm * acos(a / q_norm)
-        result[3] = d / v_norm * acos(a / q_norm)
+        acos_a_q_norm = acos(a / q_norm) / v_norm
+        result[1] = b * acos_a_q_norm
+        result[2] = c * acos_a_q_norm
+        result[3] = d * acos_a_q_norm
     return result
