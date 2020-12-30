@@ -15,13 +15,12 @@ def check_log_exp_q(q=None):
         q = rand_q(magnitude=2)
     exp_q = exp(q)
     log_q = log(q)
-    return (np.array(exp(log_q)) == np.array(q)).all()
-    #return (np.array(log(exp_q)) == np.array(q)).all() and (np.array(exp(log_q)) == np.array(q)).all()
+    return (np.array(log(exp_q)) == np.array(q)).all() and (np.array(exp(log_q)) == np.array(q)).all()
 
 
 def check_log_exp_number(test_num=None):
     if test_num is None:
-        magnitude = 5
+        magnitude = 2
         test_num = np.random.random(1)[0] * magnitude
     test_exp = exp(test_num)
     test_log = log(test_num)
@@ -46,7 +45,7 @@ class TestFunctions(unittest.TestCase):
         self.assertTrue(check_log_exp_number())
 
     def test_arrays(self):
-        qs = check_log_exp_q([rand_q(magnitude=2) for _ in range(5)])
+        qs = check_log_exp_q([rand_q(magnitude=1) for _ in range(5)])
         self.assertTrue(qs)
         ns = check_log_exp_number([np.random.random(1)[0] * 5 for _ in range(5)])
         self.assertTrue(ns)

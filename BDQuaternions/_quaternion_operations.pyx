@@ -4,7 +4,7 @@ import numpy as np
 from cython import boundscheck, wraparound
 
 from cpython.array cimport array, clone
-from libc.math cimport sqrt, cos, sin, acos
+from libc.math cimport fabs, sqrt, cos, sin, acos, atan2
 from libc.math cimport exp as c_exp, log as c_log
 from libc.float cimport DBL_MIN
 from scipy.linalg.cython_lapack cimport dsyevd
@@ -238,7 +238,8 @@ cpdef double[:] log(double[:] q):
     :return: result quaternion as numpy array of four floats
     """
     cdef:
-        double q_norm, v_norm, acos_a_q_norm, a = q[0], b = q[1], c = q[2], d = q[3]
+        double q_norm, v_norm, acos_a_q_norm
+        double a = q[0], b = q[1], c = q[2], d = q[3]
         array[double] result, template = array('d')
     result = clone(template, 4, zero=False)
     q_norm = norm(q)
