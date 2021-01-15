@@ -12,7 +12,11 @@ def check_log_exp_q(q=None):
         q = random_unit_quaternion()
     exp_q = exp(q)
     log_q = log(q)
-    return (np.array(log(exp_q)) == np.array(q)).all() and (np.array(exp(log_q)) == np.array(q)).all()
+    log_exp_q = log(exp_q)
+    exp_log_q = exp(log_q)
+    log_exp_q_q = (np.array(log_exp_q) == np.array(q)).all()
+    exp_log_q_q = (np.array(exp_log_q) == np.array(q)).all()
+    return log_exp_q_q and exp_log_q_q
 
 
 def check_log_exp_number(test_num=None):

@@ -250,4 +250,8 @@ cpdef double[:] log(double[:] q):
         result[1] = b * acos_a_q_norm
         result[2] = c * acos_a_q_norm
         result[3] = d * acos_a_q_norm
+    else:
+        result[1] = 0.0
+        result[2] = 0.0
+        result[3] = 0.0
     return result

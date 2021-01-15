@@ -25,6 +25,9 @@ cdef class Quaternion(object):
     def __str__(self):
         return str(np.asarray(self.__quadruple))
 
+    def __repr__(self):
+        return str(self)
+
     def __richcmp__(x, y, int op):
         if op == Py_EQ:
             if isinstance(x, Quaternion) and isinstance(y, Quaternion):
