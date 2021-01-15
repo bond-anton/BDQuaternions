@@ -101,7 +101,7 @@ class TestEulerAngles(unittest.TestCase):
                 convention_1 = self.conventions.get_convention(convention_1_lbl)
                 convention_2 = self.conventions.get_convention(convention_2_lbl)
                 for _ in range(3):
-                    i, j ,k = np.random.random(3) * 360
+                    i, j, k = np.random.random(3) * 360
                     ea_data = np.deg2rad([i - 180, j - 180, k - 180])
                     ea = EulerAngles(ea_data, convention_1)
                     m = ea.rotation_matrix()
