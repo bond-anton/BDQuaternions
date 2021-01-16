@@ -4,10 +4,8 @@
 name: Publish sdist to PyPI
 
 on:
-  push:
-    branches: [ master ]
-#  release:
-#    types: [created]
+  release:
+    types: [created]
 
 jobs:
   deploy:
