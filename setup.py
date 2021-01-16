@@ -151,9 +151,6 @@ setup(
     packages=find_packages(exclude=['demo', 'tests', 'docs', 'contrib', 'venv']),
     ext_modules=cythonize(extensions, compiler_directives={'language_level': sys.version_info[0]}),
     package_data={'BDQuaternions': ['*.pxd']},
-    setup_requires=['numpy', 'scipy', 'Cython'],
     install_requires=['numpy', 'scipy'],
-    test_suite='nose.collector',
-    tests_require=['nose'],
     cmdclass={'build_ext': CustomBuildExt}
 )
