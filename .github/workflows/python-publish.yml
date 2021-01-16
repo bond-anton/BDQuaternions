@@ -25,10 +25,15 @@ jobs:
         python -m pip install --upgrade pip
         pip install setuptools wheel twine
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Build and publish
+    - name: Build manylinux Python wheels
+        uses: RalfG/python-wheels-manylinux-build@v0.3.3-manylinux2010_x86_64
+        with:
+          python-versions: 'cp36-cp36m cp37-cp37m cp38-cp38 cp39-cp39'
+          build-requirements: 'cython numpy scipy'
+    - name: Publish sdist and wheels to PyPI
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
-        python setup.py sdist bdist_wheel
+        python setup.py sdist
         twine upload dist/*
