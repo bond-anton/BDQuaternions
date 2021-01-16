@@ -1,6 +1,6 @@
 # BDQuaternions
 
-[![Build Status](https://travis-ci.org/bond-anton/BDQuaternions.svg?branch=master)](https://travis-ci.org/bond-anton/BDQuaternions)
+![Build](https://github.com/bond-anton/BDQuaternions/workflows/Build/badge.svg)
 [![codecov](https://codecov.io/gh/bond-anton/BDQuaternions/branch/master/graph/badge.svg)](https://codecov.io/gh/bond-anton/BDQuaternions)
 
 **BDQuaternions** is a python package for manipulation with quaternions objects.
