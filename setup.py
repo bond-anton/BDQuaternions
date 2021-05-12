@@ -73,11 +73,11 @@ extensions = [
     ),
 ]
 
-copt = {'msvc': ['/openmp', '/Ox', '/fp:fast', '/favor:INTEL64', '/Og'],
-        'mingw32': ['-fopenmp', '-O3', '-ffast-math', '-march=native'],
-        'unix': ['-fopenmp', '-O3', '-ffast-math', '-march=native']}
-lopt = {'mingw32': ['-fopenmp'],
-        'unix': ['-fopenmp']}
+copt = {'msvc': [],
+        'mingw32': [],
+        'unix': []}
+lopt = {'mingw32': [],
+        'unix': []}
 
 
 # check whether compiler supports a flag
